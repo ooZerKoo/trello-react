@@ -1,25 +1,37 @@
-import logo from './logo.svg';
 import './App.css';
 
-function App() {
+import { connect } from 'react-redux'
+import Login from './components/Login/Login.jsx'
+import Register from './components/Register/Register.jsx'
+import PanelList from './components/PanelList/PanelList.jsx'
+import Panel from './components/Panel/Panel.jsx'
+
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
+
+const App = props => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="App" >
+      <BrowserRouter>
+        <Switch>
+          <Route path="/" exact>
+            {props.token ? <PanelList /> : <Redirect to="/login" />}
+          </Route>
+          <Route path="/login" exact>
+            {!props.token ? <Login /> : <Redirect to="/" />}
+          </Route>
+          <Route path="/register" exact>
+            {!props.token ? <Register /> : <Redirect to="/" />}
+          </Route>
+          {props.token ? <Route path="/:idPanel" component={Panel} exact /> : <Route path="/:idPanel" exact><Redirect to="/login" /></Route>}
+        </Switch>
+      </BrowserRouter>
     </div>
   );
 }
 
-export default App;
+const mapStateToProps = state => ({
+  token: state.token
+})
+const connected = connect(mapStateToProps)(App)
+
+export default connected
