@@ -1,6 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+
 import './index.scss';
+import 'antd/dist/antd.css';
+
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
@@ -9,11 +12,18 @@ import store from './services/redux/store.js'
 import {sessionService } from 'redux-react-session'
 
 const loadSession = async () => {
+
+
+
   sessionService.loadSession()
     .then(token => {
-      if (token && token.token) sessionService.saveUser({ token: token.token })
+      if (token && token.token) { 
+        sessionService.saveUser({ token: token.token })
+      } else {
+        console.log('Else index.js');
+      }
     })
-    .catch(e => console.error('loadSession() en index.js', e))
+    .catch(console.info)
 }
 
 loadSession()

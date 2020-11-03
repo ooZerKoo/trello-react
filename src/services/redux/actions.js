@@ -2,15 +2,17 @@ import axios from 'axios'
 import {
     sessionService
 } from 'redux-react-session'
-const api = require('../api/api')
+import {
+    apiCheck,
+    apiGetPanelList,
+    apiGetToken,
+    apiGetapi,
+    apiSetRegister
+} from '../api/api'
 
 // USER
 export const setLogin = async (dispatch, username, password) => {
-    const url = api.getapi('user')
-    const token = await axios.post(url + 'login', {
-        username: username,
-        password: password
-    })
+    const token = await apiGetToken(username, password)
     if (token) {
         await sessionService.saveSession({
                 token: token.data
@@ -18,6 +20,9 @@ export const setLogin = async (dispatch, username, password) => {
             .then(sessionService.saveUser({
                 token: token.data
             }))
+        return dispatch({
+            type: 'EMPTY_FORM'
+        })
     }
 }
 
@@ -27,15 +32,7 @@ export const setLogout = async (dispatch) => {
 }
 
 export const setRegister = async (dispatch, username, email, password) => {
-    const url = api.getapi('user')
-    const token = await axios.post(url + 'getpassword', {
-            password: password
-        })
-        .then(p => axios.post(url + 'add', {
-            username: username,
-            email: email,
-            password: p.data
-        }))
+    const token = await apiSetRegister(username, email, password)
     if (token) {
         await sessionService.saveSession({
                 token: token.data
@@ -43,49 +40,65 @@ export const setRegister = async (dispatch, username, email, password) => {
             .then(sessionService.saveUser({
                 token: token.data
             }))
+        return dispatch({
+            type: 'EMPTY_FORM'
+        })
     }
 }
 
-export const checkRegister = async (dispatch, data) => {
-    const url = api.getapi('user')
-    let check = true
-    if (check && data.username.length < 4) {
-        check = false
+export const checkRegister = async (dispatch, data, id) => {
+    var error = ''
+    switch (id) {
+        case 'username':
+            if (data.username.length < 4) {
+                error = 'El usuario tiene que ser más largo que 4'
+            } else {
+                const checkUsernameRegister = await apiCheck('username', data.username)
+                if (!checkUsernameRegister) {
+                    error = 'El usuario ya está registrado'
+                }
+            }
+            break
+        case 'email':
+            if (data.email.length < 4) {
+                error = 'El email es muy corto'
+            } else if (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(data.email) !== true) {
+                error = 'El email no es correcto'
+            } else {
+                const checkEmailRegister = await apiCheck('email', data.email)
+                if (!checkEmailRegister) {
+                    error = 'El email ya está registrado'
+                }
+            }
+            break
+        case 'password':
+        case 'password2':
+            if (
+                (data.password.length < 4 && data.password.length > 0) &&
+                (data.password2.length < 4 && data.password2.length > 0)
+            ) {
+                error = 'La contraseña tiene que ser más largo que 4'
+            } else if (data.password !== data.password2) {
+                error = 'Las contraseñas no coniciden'
+            }
+            break
+        default:
+            break
     }
-
-    if (check && data.email.length < 4) {
-        check = false
-    }
-
-    if (check && (data.password.length < 4 || data.password2.length < 4 || data.password !== data.password2)) {
-        check = false
-    }
-
-    if (check) {
-        const checkusername = await axios.post(url + 'checkusername', {
-            username: data.username
+    if (error) {
+        return dispatch({
+            type: 'ADD_ERROR',
+            payload: {
+                id: id,
+                error: error
+            }
         })
-        check = checkusername.data
     }
-
-    if (check) {
-        const checkemail = await axios.post(url + 'checkemail', {
-            email: data.email
-        })
-        check = checkemail.data
-    }
-
-    return dispatch({
-        type: 'UPDATE_FORM_STATUS',
-        payload: check
-    })
 }
 
 // PANEL
 export const getPanelList = async (dispatch, token) => {
-    const url = api.getapi('panel')
-    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
-    axios.get(url)
+    apiGetPanelList(token)
         .then(panel => {
             return dispatch({
                 type: 'SET_PANEL_LIST',
@@ -96,7 +109,7 @@ export const getPanelList = async (dispatch, token) => {
 }
 
 export const addPanel = async (dispatch, token, data) => {
-    const url = api.getapi('panel')
+    const url = apiGetapi('panel')
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
     axios.post(url, {
             ...data
@@ -111,7 +124,7 @@ export const addPanel = async (dispatch, token, data) => {
 }
 
 export const deletePanel = async (dispatch, token, id) => {
-    const url = api.getapi('panel', id)
+    const url = apiGetapi('panel', id)
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
     await axios.delete(url)
         .then(panel => {
@@ -125,7 +138,7 @@ export const deletePanel = async (dispatch, token, id) => {
 
 // LIST
 export const getListList = async (dispatch, token, id) => {
-    const url = api.getapi('list', id)
+    const url = apiGetapi('list', id)
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
     axios.get(url)
         .then(list => {
@@ -141,9 +154,11 @@ export const getListList = async (dispatch, token, id) => {
 }
 
 export const addList = async (dispatch, token, id, data) => {
-    const url = api.getapi('list', id)
+    const url = apiGetapi('list', id)
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
-    axios.post(url, {...data})
+    axios.post(url, {
+            ...data
+        })
         .then(list => dispatch({
             type: 'UPDATE_LIST',
             payload: list.data,
@@ -153,7 +168,7 @@ export const addList = async (dispatch, token, id, data) => {
 }
 
 export const deleteList = async (dispatch, token, idList, idPanel) => {
-    const url = api.getapi('list', idList)
+    const url = apiGetapi('list', idList)
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
     await axios.delete(url)
         .then(list => {
@@ -166,11 +181,6 @@ export const deleteList = async (dispatch, token, idList, idPanel) => {
 }
 
 // FORMS
-export const updateFormStatus = (dispatch, check) => dispatch({
-    type: 'UPDATE_FORM_STATUS',
-    payload: check
-})
-
 export const updateFormFields = (dispatch, fields) => dispatch({
     type: 'UPDATE_FORM_FIELDS',
     payload: {
@@ -186,4 +196,14 @@ export const emptyForm = (dispatch, fields) => dispatch({
 export const setFormType = (dispatch, data) => dispatch({
     type: 'SET_FORM_TYPE',
     payload: data
+})
+
+// MESSAGES
+export const deleteErrorMessages = (dispatch) => dispatch({
+    type: 'DELETE_ERROR'
+})
+
+export const addErrorMessage = (dispatch, message) => dispatch({
+    type: 'ADD_ERROR',
+    payload: message
 })
