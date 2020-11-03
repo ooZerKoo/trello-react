@@ -1,13 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { NavLink } from 'react-router-dom'
-import { getPanelList, addPanel, deletePanel, setGetDataDone, unsetGetDataDone, updateFormStatus, updateFormFields } from '../../services/redux/actions.js'
+import { NavLink } from 'react-router-dom';
+import { getPanelList, addPanel, deletePanel, updateFormStatus, updateFormFields } from '../../services/redux/actions.js'
+
+let done = false;
 
 const PanelList = props => {
 
-    if (!props.gotdata) {
+    if (!done && props.token) {
         props.getPanelList(props.token)
-        props.setGetDataDone()
+        done = true
     }
 
     const prepareForm = (event) => {
@@ -49,15 +51,15 @@ const PanelList = props => {
                     <input id="name" onChange={prepareForm} value={props.form.name} type='text' />
                 </div>
                 <div className="row">
-                    <button onClick={addNewPanel} >Añadir</button>
+                    <button onClick={addNewPanel} disabled={!props.form.status} >Añadir</button>
                 </div>
             </div>
 
-            {props.panels.map(panel => (
+            {props.panels?.map(panel => (
                 <div key={panel._id} className="panel">
                     <h3>{panel.name}</h3>
-                    <span onClick={() => deleteOnePanel(panel._id)}>Eliminar</span>
-                    <NavLink to={'/' + panel._id} onClick={() => props.unsetGetDataDone()}>Ver Panel</NavLink>
+                    <span className="btn" onClick={() => deleteOnePanel(panel._id)}>Eliminar</span>
+                    <NavLink className="btn" to={'/' + panel._id} >Ver Panel</NavLink>
                 </div>
             ))}
         </div>
@@ -65,11 +67,9 @@ const PanelList = props => {
 }
 
 const mapStateToProps = state => ({
-    token: state.token,
-    panels: state.list,
+    token: state.session.user.token,
+    panels: state.panel.list,
     form: state.form,
-    status: state.form.status,
-    gotdata: state.gotdata,
 })
 const mapDispatchToProps = (dispatch) => ({
     // list
@@ -77,12 +77,9 @@ const mapDispatchToProps = (dispatch) => ({
     // actions
     addPanel: (token, data) => addPanel(dispatch, token, data),
     deletePanel: (token, id) => deletePanel(dispatch, token, id),
-    // data
-    setGetDataDone: () => setGetDataDone(dispatch),
-    unsetGetDataDone: () => unsetGetDataDone(dispatch),
     // forms
     updateFormFields: (fields) => updateFormFields(dispatch, fields),
-    updateFormStatus: (check) => updateFormStatus(dispatch, check)
+    updateFormStatus: (check) => updateFormStatus(dispatch, check),
 })
 
 const connected = connect(

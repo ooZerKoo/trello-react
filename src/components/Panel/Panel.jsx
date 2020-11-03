@@ -1,12 +1,14 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { getListList, addList, deleteList, setGetDataDone, updateFormFields, updateFormStatus } from '../../services/redux/actions.js'
+import { getListList, addList, deleteList, updateFormFields, updateFormStatus } from '../../services/redux/actions.js'
+
+let done = false
 
 const Panel = props => {
 
-    if (!props.gotdata) {
+    if ((!done && props.idPanel) || (props.lists.length === 0)) {
         props.getListList(props.token, props.idPanel)
-        props.setGetDataDone()
+        done = true
     }
 
     const prepareForm = (event) => {
@@ -23,8 +25,8 @@ const Panel = props => {
         props.addList(props.token, props.idPanel, data)
     }
 
-    const deleteOneList = (id) => {
-        props.deleteList(props.token, id)
+    const deleteOneList = (idList) => {
+        props.deleteList(props.token, idList, props.idPanel)
     }
 
     return (<div className="panel">PANEL 2
@@ -34,37 +36,33 @@ const Panel = props => {
                 <input type="text" id="name" onChange={prepareForm} onKeyUp={prepareForm} />
             </div>
             <div className="row">
-                <button onClick={addNewList}>Añadir Lista</button>
+                <button onClick={addNewList} disabled={!props.form.status}>Añadir Lista</button>
             </div>
         </div>
-        {props.lists.map(list => (
+        {props.lists[0]?.list.map(list => (
             <div key={list._id} className="list">
                 <h3>{list.name}</h3>
-                <span onClick={() => deleteOneList(list._id)}>Eliminar</span>
+                <span className="btn" onClick={() => deleteOneList(list._id)}>Eliminar</span>
             </div>
         ))}
     </div>)
 }
 
 const mapStateToProps = (state, extraVars) => ({
-    token: state.token,
-    lists: state.list,
+    token: state.session.user.token,
+    lists: state.list.list.filter(v => v.id === extraVars.match.params.idPanel),
     form: state.form,
-    status: state.form.status,
-    gotdata: state.gotdata,
-    idPanel: extraVars.match.params.idPanel
+    idPanel: extraVars.match.params.idPanel,
 })
 const mapDispatchToProps = (dispatch) => ({
     // list
     getListList: (token, id) => getListList(dispatch, token, id),
     // actions
     addList: (token, id, data) => addList(dispatch, token, id, data),
-    deleteList: (token, id) => deleteList(dispatch, token, id),
-    // data
-    setGetDataDone: () => setGetDataDone(dispatch),
+    deleteList: (token, idList, idPanel) => deleteList(dispatch, token, idList, idPanel),
     // forms
     updateFormFields: (fields) => updateFormFields(dispatch, fields),
-    updateFormStatus: (check) => updateFormStatus(dispatch, check)
+    updateFormStatus: (check) => updateFormStatus(dispatch, check),
 })
 
 const connected = connect(

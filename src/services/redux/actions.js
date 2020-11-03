@@ -1,24 +1,34 @@
 import axios from 'axios'
+import {
+    sessionService
+} from 'redux-react-session'
 const api = require('../api/api')
 
 // USER
 export const setLogin = async (dispatch, username, password) => {
     const url = api.getapi('user')
-    return axios.post(url + 'login', {
-            username: username,
-            password: password
-        })
-        .then(token =>
-            dispatch({
-                type: 'ADD_TOKEN',
-                payload: token.data
+    const token = await axios.post(url + 'login', {
+        username: username,
+        password: password
+    })
+    if (token) {
+        await sessionService.saveSession({
+                token: token.data
             })
-        )
+            .then(sessionService.saveUser({
+                token: token.data
+            }))
+    }
+}
+
+export const setLogout = async (dispatch) => {
+    await sessionService.deleteSession()
+        .then(sessionService.deleteUser())
 }
 
 export const setRegister = async (dispatch, username, email, password) => {
     const url = api.getapi('user')
-    return axios.post(url + 'getpassword', {
+    const token = await axios.post(url + 'getpassword', {
             password: password
         })
         .then(p => axios.post(url + 'add', {
@@ -26,12 +36,14 @@ export const setRegister = async (dispatch, username, email, password) => {
             email: email,
             password: p.data
         }))
-        .then(token =>
-            dispatch({
-                type: 'ADD_TOKEN',
-                payload: token.data
+    if (token) {
+        await sessionService.saveSession({
+                token: token.data
             })
-        )
+            .then(sessionService.saveUser({
+                token: token.data
+            }))
+    }
 }
 
 export const checkRegister = async (dispatch, data) => {
@@ -40,11 +52,11 @@ export const checkRegister = async (dispatch, data) => {
     if (check && data.username.length < 4) {
         check = false
     }
-    
+
     if (check && data.email.length < 4) {
         check = false
     }
-    
+
     if (check && (data.password.length < 4 || data.password2.length < 4 || data.password !== data.password2)) {
         check = false
     }
@@ -76,7 +88,7 @@ export const getPanelList = async (dispatch, token) => {
     axios.get(url)
         .then(panel => {
             return dispatch({
-                type: 'SET_LIST',
+                type: 'SET_PANEL_LIST',
                 payload: panel.data
             })
         })
@@ -91,7 +103,7 @@ export const addPanel = async (dispatch, token, data) => {
         })
         .then(panel => {
             return dispatch({
-                type: 'UPDATE_LIST',
+                type: 'UPDATE_PANEL_LIST',
                 payload: panel.data
             })
         })
@@ -104,7 +116,7 @@ export const deletePanel = async (dispatch, token, id) => {
     await axios.delete(url)
         .then(panel => {
             return dispatch({
-                type: 'DELETE_FROM_LIST',
+                type: 'DELETE_FROM_PANEL_LIST',
                 payload: panel.data
             })
         })
@@ -119,7 +131,10 @@ export const getListList = async (dispatch, token, id) => {
         .then(list => {
             return dispatch({
                 type: 'SET_LIST',
-                payload: list.data
+                payload: [{
+                    id: id,
+                    list: list.data
+                }]
             })
         })
         .catch(console.error)
@@ -128,40 +143,27 @@ export const getListList = async (dispatch, token, id) => {
 export const addList = async (dispatch, token, id, data) => {
     const url = api.getapi('list', id)
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
-    axios.post(url, {
-            ...data
-        })
-        .then(list => {
-            return dispatch({
-                type: 'UPDATE_LIST',
-                payload: list.data
-            })
-        })
+    axios.post(url, {...data})
+        .then(list => dispatch({
+            type: 'UPDATE_LIST',
+            payload: list.data,
+            idPanel: id
+        }))
         .catch(console.error)
 }
 
-export const deleteList = async (dispatch, token, id) => {
-    const url = api.getapi('list', id)
+export const deleteList = async (dispatch, token, idList, idPanel) => {
+    const url = api.getapi('list', idList)
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
     await axios.delete(url)
         .then(list => {
             return dispatch({
                 type: 'DELETE_FROM_LIST',
-                payload: list.data
+                payload: list.data,
+                idPanel: idPanel
             })
         })
 }
-
-
-// DATA TAKEN
-export const setGetDataDone = (dispatch) => dispatch({
-    type: 'SET_GET_DATA_DONE'
-})
-
-export const unsetGetDataDone = (dispatch) => dispatch({
-    type: 'UNSET_GET_DATA_DONE'
-})
-
 
 // FORMS
 export const updateFormStatus = (dispatch, check) => dispatch({
@@ -175,10 +177,13 @@ export const updateFormFields = (dispatch, fields) => dispatch({
         ...fields
     }
 })
-
 export const emptyForm = (dispatch, fields) => dispatch({
     type: 'EMPTY_FORM',
     payload: {
         ...fields
     }
+})
+export const setFormType = (dispatch, data) => dispatch({
+    type: 'SET_FORM_TYPE',
+    payload: data
 })

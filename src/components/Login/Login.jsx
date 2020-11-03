@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { setLogin, updateFormStatus, updateFormFields } from '../../services/redux/actions.js'
+import { setLogin, updateFormStatus, updateFormFields, emptyForm } from '../../services/redux/actions.js'
 
 const Login = props => {
     const updateFields = (event) => {
@@ -21,7 +21,10 @@ const Login = props => {
         }
     }
 
-    const prepareLogin = () => props.setLogin(props.form.username, props.form.password)
+    const prepareLogin = () => {
+        props.setLogin(props.form.username, props.form.password)
+        props.emptyForm()
+    }
 
     return (
         <div className="form">
@@ -42,11 +45,11 @@ const Login = props => {
 
 const mapStateToProps = state => ({
     form: state.form,
-    gotdata: state.gotdata,
 })
 const mapDispatchToProps = (dispatch) => ({
     updateFormFields: (fields) => updateFormFields(dispatch, fields),
     updateFormStatus: (check) => updateFormStatus(dispatch, check),
+    emptyForm: () => emptyForm(dispatch),
     setLogin: (username, password) => setLogin(dispatch, username, password),
 })
 

@@ -1,0 +1,63 @@
+@import './colors.scss';
+
+body {
+  margin: 0;
+  font-family: 'Barlow', 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+button,
+.btn {
+  color: $primary;
+  background: $light;
+  border: 1px solid;
+  padding: 0.4eM 0.6eM;
+  cursor: pointer;
+  transition: 0.3s ease color, 0.3s ease background-color;
+  margin-right: 0.5eM;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 1eM;
+  line-height: 1eM;
+}
+
+button:hover,
+.btn:hover {
+  color: $light;
+  background: $primary;
+}
+
+button.active,
+.btn.active {
+  background: $red;
+  color: $light;
+}
+
+button.active:hover,
+.btn.active:hover {
+  background: $light;
+  color: $red;
+}
+
+.form {
+  background: $light;
+  max-width: 350px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-gap: 1vh;
+  padding: 1vh 1vw;
+}
+
+button:disabled,
+.btn:disabled {
+  opacity: 0.5;
+}
