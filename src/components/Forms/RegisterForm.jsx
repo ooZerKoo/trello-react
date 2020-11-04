@@ -88,8 +88,8 @@ const RegisterForm = props => {
     };
 
     return (
-        <Row justify="space-around">
-            <Col xs={24} md={20} lg={12} xl={8} offset={{ xs: 0, md: 2, lg: 6, xl: 9 }}>
+        <Row justify="center" span={8}>
+            <Col xs={24} sm={24} md={16} lg={12} xl={8} xxl={6}>
                 <Form {...layout} onFinish={data => doRegister(data)}>
                     {rows.map(row => (
                         <Form.Item

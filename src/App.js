@@ -3,10 +3,7 @@ import './App.css';
 import React from 'react'
 import { connect } from 'react-redux'
 
-import List from './pages/List.jsx'
-import Panel from './pages/Panel.jsx'
-import Login from './pages/Login.jsx'
-import Register from './pages/Register.jsx'
+import GlobalLayout from './pages/GlobalLayout.jsx'
 
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
 
@@ -16,8 +13,8 @@ const App = props => {
 			<BrowserRouter>
 				{!props.auth &&
 					<Switch>
-						<Route path="/login" component={Login} exact />
-						<Route path="/register" component={Register} exact />
+						<Route path="/login" component={GlobalLayout} pageToDisplay='login' exact />
+						<Route path="/register" component={GlobalLayout} pageToDisplay='register' exact />
 						<Route path="/" exact><Redirect to="/login" /></Route>
 					</Switch>
 				}
@@ -25,8 +22,8 @@ const App = props => {
 					<Switch>
 						<Route path="/login" exact><Redirect to="/" /></Route>
 						<Route path="/register" exact><Redirect to="/" /></Route>
-						<Route path="/:idPanel" component={List} exact /> :
-						<Route path="/" component={Panel} exact />
+						<Route path="/:idPanel" component={GlobalLayout} pageToDisplay='list' exact /> :
+						<Route path="/" component={GlobalLayout} pageToDisplay='panel' exact />
 					</Switch>
 				}
 			</BrowserRouter>
@@ -34,7 +31,7 @@ const App = props => {
 	);
 }
 
-const mapStateToProps = (state, extra) => ({
+const mapStateToProps = state => ({
 	auth: state.session.authenticated
 })
 const connected = connect(mapStateToProps)(App)

@@ -4,7 +4,6 @@ import { connect } from 'react-redux'
 import PanelList from '../components/List/Panel.jsx'
 import PanelForm from '../components/Forms/PanelForm.jsx'
 
-
 const Panel = props => {
     return (
         <React.Fragment>

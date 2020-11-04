@@ -4,6 +4,8 @@ import { setLogin } from '../../services/redux/actions.js'
 import { Form, Button, Row, Col, Input, Divider } from 'antd'
 import { NavLink } from 'react-router-dom'
 
+import './Form.scss'
+
 import { apiGetToken, apiCheck } from '../../services/api/api.js'
 
 const LoginForm = props => {
@@ -60,8 +62,8 @@ const LoginForm = props => {
     };
 
     return (
-        <Row justify="space-around">
-            <Col xs={24} md={20} lg={12} xl={8} offset={{ xs: 0, md: 2, lg: 6, xl: 9 }}>
+        <Row justify="center" span={8}>
+            <Col xs={24} sm={24} md={16} lg={12} xl={8} xxl={6}>
                 <Form {...layout} onFinish={data => prepareLogin(data)}>
                     {rows.map(row => (
                         <Form.Item

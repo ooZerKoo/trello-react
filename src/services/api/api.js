@@ -10,6 +10,8 @@ export const apiGetapi = (path, id = null) => {
             return base + 'panel' + (id ? `/${id}` : '')
         case 'list':
             return base + 'list' + (id ? `/${id}` : '')
+        case 'task':
+            return base + 'task' + (id ? `/${id}` : '')
     }
 }
 
@@ -124,4 +126,26 @@ export const apiDeleteList = async (token, id) => {
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
     const list = await axios.delete(url)
     return list.data
+}
+
+// TASKS
+export const apiGetTaskList = async (token, id) => {
+    const url = apiGetapi('task', id)
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    const task = await axios.get(url)
+    return task.data
+}
+
+export const apiAddTask = async (token, id, data) => {
+    const url = apiGetapi('task', id)
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    const task = await axios.post(url, {...data})
+    return task.data
+}
+
+export const apiDeleteTask = async (token, id) => {
+    const url = apiGetapi('task', id)
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    const task = await axios.delete(url)
+    return task.data
 }
