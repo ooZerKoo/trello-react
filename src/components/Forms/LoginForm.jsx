@@ -1,11 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { setLogin } from '../../services/redux/actions.js'
-import { Form, Button, Divider, Row, Col, Input } from 'antd'
+import { Form, Button, Row, Col, Input, Divider } from 'antd'
 import { NavLink } from 'react-router-dom'
-import { apiCheck, apiGetToken } from '../../services/api/api.js'
 
-const Login = props => {
+import { apiGetToken, apiCheck } from '../../services/api/api.js'
+
+const LoginForm = props => {
 
     const prepareLogin = async (data) => {
         apiGetToken(data.username, data.password)
@@ -85,12 +86,12 @@ const Login = props => {
 }
 
 const mapDispatchToProps = (dispatch) => ({
-    setLogin: (token) => setLogin(dispatch, token),
+    setLogin: (token) => setLogin(dispatch, token)
 })
 
 const connected = connect(
     null,
     mapDispatchToProps
-)(Login)
+)(LoginForm)
 
 export default connected

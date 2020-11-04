@@ -1,11 +1,12 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { setLogin } from '../../services/redux/actions.js'
-import { Form, Button, Divider, Row, Col, Input } from 'antd'
+import { Form, Button, Row, Col, Input, Divider } from 'antd'
 import { NavLink } from 'react-router-dom'
-import { apiCheck, apiSetRegister } from '../../services/api/api.js'
 
-const Register = props => {
+import { apiSetRegister, apiCheck } from '../../services/api/api.js'
+
+const RegisterForm = props => {
 
     const doRegister = (data) => {
         apiSetRegister(data.username, data.email, data.password)
@@ -81,7 +82,6 @@ const Register = props => {
         }
     ]
 
-
     const layout = {
         labelCol: { span: 8 },
         wrapperCol: { span: 16 },
@@ -113,16 +113,13 @@ const Register = props => {
     )
 }
 
-const mapStateToProps = state => ({
-    form: state.form,
-})
 const mapDispatchToProps = (dispatch) => ({
     setLogin: (token) => setLogin(dispatch, token)
 })
 
 const connected = connect(
-    mapStateToProps,
+    null,
     mapDispatchToProps
-)(Register)
+)(RegisterForm)
 
 export default connected

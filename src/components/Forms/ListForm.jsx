@@ -1,14 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { setListList } from '../../services/redux/actions.js'
+import { apiGetListList, apiAddList } from '../../services/api/api.js'
+import { Form, Button, Row, Col, Input } from 'antd'
 
-import { apiGetListList, apiAddList, apiDeleteList } from '../../services/api/api.js'
-
-import { Form, Button, Divider, Row, Col, Input } from 'antd'
-
-let done = false
-
-const Panel = props => {
+const ListForm = props => {
 
     const getListList = async () => {
         apiGetListList(props.token, props.idPanel)
@@ -18,24 +14,6 @@ const Panel = props => {
     const addNewList = async(data) => {
         apiAddList(props.token, props.idPanel, {name: data.name})
             .then(getListList)
-    }
-
-    const deleteOneList = async (idList) => {
-        apiDeleteList(props.token, idList)
-            .then(getListList)
-    }
-
-    const getLists = () => {
-        return props.lists[0]?.list.map(list => (
-            <Row key={list._id}>
-                <h3>{list.name}</h3>
-                <Button type="danger" onClick={() => deleteOneList(list._id)}>Eliminar</Button>
-            </Row>
-        ))
-    }
-    if ((!done && props.idPanel) || (props.lists.length === 0)) {
-        getListList()
-        done = true
     }
 
     return (
@@ -56,22 +34,20 @@ const Panel = props => {
                         </Form.Item>
 
                         <Form.Item wrapperCol={{ span: 24 }}>
-                            <Button type="primary" block size="large" htmlType="submit">Añadir Panel</Button>
+                            <Button type="primary" block size="large" htmlType="submit">Añadir Lista</Button>
                         </Form.Item>
                     </Form>
                 </Col>
             </Row>
-            {getLists()}
         </React.Fragment>
     )
 }
 
 const mapStateToProps = (state, extraVars) => ({
-    idPanel: extraVars.match.params.idPanel,
+    idPanel: extraVars.idPanel,
     token: state.session.user.token,
-    lists: state.list.filter(v => v.id == extraVars.match.params.idPanel),
-    full: state.list,
 })
+
 const mapDispatchToProps = (dispatch) => ({
     setListList: (id, list) => setListList(dispatch, id, list),
 })
@@ -79,6 +55,6 @@ const mapDispatchToProps = (dispatch) => ({
 const connected = connect(
     mapStateToProps,
     mapDispatchToProps
-)(Panel)
+)(ListForm)
 
 export default connected

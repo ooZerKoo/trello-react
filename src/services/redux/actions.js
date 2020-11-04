@@ -1,24 +1,13 @@
-import axios from 'axios'
-import {
-    sessionService
-} from 'redux-react-session'
-import {
-    apiGetapi,
-    apiSetRegister
-} from '../api/api'
+import sessionService from 'redux-react-session'
 
 // USER
 export const setLogin = async (dispatch, token) => {
-    await sessionService.saveSession({
-            token: token
-        })
-        .then(sessionService.saveUser({
-            token: token
-        }))
+    sessionService.saveSession({token: token})
+        .then(sessionService.saveUser({token: token}))
 }
 
 export const setLogout = async (dispatch) => {
-    await sessionService.deleteSession()
+    sessionService.deleteSession()
         .then(sessionService.deleteUser())
 }
 
@@ -41,31 +30,3 @@ export const setListList = (dispatch, id, list) => {
         }]
     })
 }
-
-// FORMS
-export const updateFormFields = (dispatch, fields) => dispatch({
-    type: 'UPDATE_FORM_FIELDS',
-    payload: {
-        ...fields
-    }
-})
-export const emptyForm = (dispatch, fields) => dispatch({
-    type: 'EMPTY_FORM',
-    payload: {
-        ...fields
-    }
-})
-export const setFormType = (dispatch, data) => dispatch({
-    type: 'SET_FORM_TYPE',
-    payload: data
-})
-
-// MESSAGES
-export const deleteErrorMessages = (dispatch) => dispatch({
-    type: 'DELETE_ERROR'
-})
-
-export const addErrorMessage = (dispatch, message) => dispatch({
-    type: 'ADD_ERROR',
-    payload: message
-})

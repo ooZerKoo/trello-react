@@ -1,42 +1,19 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { NavLink } from 'react-router-dom';
 import { setPanelList } from '../../services/redux/actions.js'
+import { apiGetPanelList, apiAddPanel } from '../../services/api/api.js'
 import { Form, Button, Row, Col, Input } from 'antd'
-import { apiGetPanelList, apiAddPanel, apiDeletePanel } from '../../services/api/api.js'
 
-let done = false;
-
-const PanelList = props => {
+const PanelForm = props => {
 
     const getPanelList = async () => {
         apiGetPanelList(props.token)
-            .then(panels => props.setPanelList(panels))
+            .then(list => props.setPanelList(list))
     }
 
-    const addNewPanel = async (data) => {
-        apiAddPanel(props.token, data)
+    const addNewPanel = async(data) => {
+        apiAddPanel(props.token, {name: data.name})
             .then(getPanelList)
-    }
-
-    const deleteOnePanel = (id) => {
-        apiDeletePanel(props.token, id)
-            .then(getPanelList)
-    }
-
-    const getPanels = () => {
-        return props.panels?.map(panel => (
-            <Row key={panel._id}>
-                <h3>{panel.name}</h3>
-                <Button type="danger" onClick={() => deleteOnePanel(panel._id)}>Eliminar</Button>
-                <NavLink className="btn" to={'/' + panel._id} >Ver Panel</NavLink>
-            </Row>
-        ))
-    }
-
-    if (!done && props.token) {
-        getPanelList()
-        done = true
     }
 
     return (
@@ -57,27 +34,26 @@ const PanelList = props => {
                         </Form.Item>
 
                         <Form.Item wrapperCol={{ span: 24 }}>
-                            <Button type="primary" block size="large" htmlType="submit">Añadir Panel</Button>
+                            <Button type="primary" block size="large" htmlType="submit">Añadir Lista</Button>
                         </Form.Item>
                     </Form>
                 </Col>
             </Row>
-            {getPanels()}
         </React.Fragment>
     )
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
     token: state.session.user.token,
-    panels: state.panel,
 })
+
 const mapDispatchToProps = (dispatch) => ({
-    setPanelList: (panels) => setPanelList(dispatch, panels),
+    setPanelList: (list) => setPanelList(dispatch, list),
 })
 
 const connected = connect(
     mapStateToProps,
     mapDispatchToProps
-)(PanelList)
+)(PanelForm)
 
 export default connected
