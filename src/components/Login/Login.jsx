@@ -1,41 +1,95 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { setLogin } from '../../services/redux/actions.js'
-import Form from '../Form/Form.jsx'
+import { Form, Button, Divider, Row, Col, Input } from 'antd'
+import { NavLink } from 'react-router-dom'
+import { apiCheck, apiGetToken } from '../../services/api/api.js'
 
 const Login = props => {
 
-    const prepareLogin = () => {
-        props.setLogin(props.form.username, props.form.password)
+    const prepareLogin = async (data) => {
+        apiGetToken(data.username, data.password)
+            .then(token => props.setLogin(token))
     }
 
-    const getForm = () => {
-        const rows = [
-            {id: 'username', name: 'Usuario'},
-            {id: 'password', name: 'Contraseña', type:'password'}
-        ]
-        return <Form rows={rows} />
-    }
+    const rows = [
+        {
+            id: 'username',
+            name: 'Usuario',
+            rules: [
+                { required: true, message: 'El usuario es obligatorio' },
+                { min: 4, message: 'El usuario tiene que ser de 4 caracteres' },
+                { whitespace: true, message: 'No puede estar vacío' },
+                ({ getFieldValue }) => ({
+                    async validator(rule, value) {
+                        const check = await apiCheck('username', value)
+                        if (!check) {
+                            return Promise.resolve()
+                        }
+                        return Promise.reject('No hemos encontrado el usuario')
+                    }
+                })
+            ]
+        },
+        {
+            id: 'password',
+            name: 'Contraseña',
+            type: 'password',
+            rules: [
+                { required: true, message: 'La contraseña es obligatoria' },
+                { min: 4, message: 'La contraseña tiene que ser de 4 caracteres' },
+                { whitespace: true, message: 'No puede estar vacío' },
+                ({ getFieldValue }) => ({
+                    async validator(rule, value) {
+                        const username = getFieldValue('username')
+                        const check = await apiGetToken(username, value)
+                        if (check) {
+                            return Promise.resolve()
+                        }
+                        return Promise.reject('Contraseña incorrecta')
+                    }
+                })
+            ]
+        },
+    ]
+
+    const layout = {
+        labelCol: { span: 8 },
+        wrapperCol: { span: 16 },
+    };
 
     return (
-        <div className="form">
-            {getForm()}
-            <div className="row">
-                <button onClick={() => prepareLogin()} >Iniciar Sesión</button>
-            </div>
-        </div>
+        <Row justify="space-around">
+            <Col xs={24} md={20} lg={12} xl={8} offset={{ xs: 0, md: 2, lg: 6, xl: 9 }}>
+                <Form {...layout} onFinish={data => prepareLogin(data)}>
+                    {rows.map(row => (
+                        <Form.Item
+                            hasFeedback
+                            dependencies={row.dependencies}
+                            key={row.id}
+                            label={row.name}
+                            name={row.id}
+                            rules={row.rules}>
+                            {row.type === 'password' ? <Input.Password size="large" /> : <Input size="large" />}
+                        </Form.Item>
+                    ))}
+                    <Form.Item wrapperCol={24}>
+                        <Button type="primary" block size="large" htmlType="submit">Iniciar Sesión</Button>
+                    </Form.Item>
+                    <Divider orientation="left">ó bien</Divider>
+                    <NavLink to='/register'><Button block size="large" type="dashed">Regístrate</Button></NavLink>
+                </Form>
+            </Col>
+        </Row>
     )
 }
 
-const mapStateToProps = state => ({
-    form: state.form,
-})
 const mapDispatchToProps = (dispatch) => ({
-    setLogin: (username, password) => setLogin(dispatch, username, password),
+    setLogin: (token) => setLogin(dispatch, token),
 })
 
 const connected = connect(
-    mapStateToProps,
+    null,
     mapDispatchToProps
 )(Login)
 

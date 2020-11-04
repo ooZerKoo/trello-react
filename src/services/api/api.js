@@ -24,7 +24,7 @@ export const apiGetToken = async (username, password) => {
             username: username,
             password: password
         })
-        return token
+        return token.data
     } catch (error) {
         console.error(error)
     }
@@ -41,7 +41,7 @@ export const apiSetRegister = async (username, email, password) => {
                 email: email,
                 password: p.data
             }))
-        return token
+        return token.data
     } catch (error) {
         console.error(error)
     }
@@ -72,14 +72,56 @@ export const apiCheck = async (type, data) => {
     }
 }
 
+
+// PANELS
 export const apiGetPanelList = async (token) => {
     try {
         const url = apiGetapi('panel')
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
         const list = await axios.get(url)
-        return list
+        return list.data
     } catch (error) {
         console.error(error)
     }
 
+}
+
+export const apiAddPanel = async (token, data) => {
+    try {
+        const url = apiGetapi('panel')
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+        const panel = await axios.post(url, {...data})
+        return panel.data
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export const apiDeletePanel = async (token, id) => {
+    const url = apiGetapi('panel', id)
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    const panel = await axios.delete(url)
+    return panel.data
+}
+
+// LISTS
+export const apiGetListList = async (token, id) => {
+    const url = apiGetapi('list', id)
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    const list = await axios.get(url)
+    return list.data
+}
+
+export const apiAddList = async (token, id, data) => {
+    const url = apiGetapi('list', id)
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    const list = await axios.post(url, {...data})
+    return list.data
+}
+
+export const apiDeleteList = async (token, id) => {
+    const url = apiGetapi('list', id)
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    const list = await axios.delete(url)
+    return list.data
 }

@@ -2,29 +2,37 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { NavLink } from 'react-router-dom'
 import { setLogout } from '../../services/redux/actions.js'
-import './Header.scss'
+import { Layout, Menu, Breadcrumb } from 'antd';
+const { Header, Content, Footer } = Layout;
 
-const Header = props => {
+
+const Headerdesign = props => {
     return (
-        <header>
-            <div className="container">
-                {props.auth && <React.Fragment>
-                        <NavLink className="btn" to='/'>Paneles</NavLink>
-                        <span className="btn" onClick={() => props.logout()}>Cerrar Sesión</span>
-                    </React.Fragment>}
-                {!props.auth &&
+        <Header>
+            <div className="logo" />
+            <Menu theme="dark" mode="horizontal">
+                {props.auth &&
                     <React.Fragment>
-                        <NavLink className="btn" to='/login'>Login</NavLink>
-                        <NavLink className="btn" to='/register'>Register</NavLink>
+                        <Menu.Item key="1" className={props.path === '/' ? 'active' : ''}><NavLink to='/'>Paneles</NavLink></Menu.Item>
+                        <Menu.Item key="2"><NavLink to='/' onClick={() => props.logout()}>Cerrar Sesión</NavLink></Menu.Item>
                     </React.Fragment>
                 }
-            </div>
-        </header>
+                {!props.auth && 
+                <React.Fragment>
+                    <Menu.Item key="1" className={props.path === '/login' ? 'active' : ''}><NavLink to='/login'>Login</NavLink></Menu.Item>    
+                    <Menu.Item key="2" className={props.path === '/register' ? 'active' : ''}><NavLink to='/register'>Regístrate</NavLink></Menu.Item>    
+                </React.Fragment>
+                }
+            </Menu>
+        </Header>
     )
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state, location) => ({
     auth: state.session.authenticated,
+    path: null,
+    state: state,
+    extra: location,
 })
 const mapDispatchToProps = (dispatch) => ({
     logout: () => setLogout(dispatch)
@@ -33,6 +41,6 @@ const mapDispatchToProps = (dispatch) => ({
 const connected = connect(
     mapStateToProps,
     mapDispatchToProps
-)(Header)
+)(Headerdesign)
 
 export default connected

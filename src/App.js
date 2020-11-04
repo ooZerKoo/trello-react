@@ -6,7 +6,7 @@ import Login from './components/Login/Login.jsx'
 import Register from './components/Register/Register.jsx'
 import PanelList from './components/PanelList/PanelList.jsx'
 import Panel from './components/Panel/Panel.jsx'
-import Header from './components/Header/Header.jsx'
+import Headerdesign from './components/Header/Header.jsx'
 import ErrorsMessage from './components/Message/ErrorsMessage.jsx'
 
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
@@ -16,7 +16,7 @@ const App = props => {
 		<div className="App" >
 			<ErrorsMessage />
 			<BrowserRouter>
-				<Header />
+				<Headerdesign />
 				<Switch>
 					<Route path="/login" exact>
 						{!props.auth ? <Login /> : <Redirect to="/" />}

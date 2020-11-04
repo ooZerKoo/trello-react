@@ -1,31 +1,115 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { setRegister } from '../../services/redux/actions.js'
-import Form from '../Form/Form.jsx'
+import { setLogin } from '../../services/redux/actions.js'
+import { Form, Button, Divider, Row, Col, Input } from 'antd'
+import { NavLink } from 'react-router-dom'
+import { apiCheck, apiSetRegister } from '../../services/api/api.js'
 
 const Register = props => {
 
-    const prepareRegister = () => {
-        props.setRegister(props.form.username, props.form.email, props.form.password)
+    const doRegister = (data) => {
+        apiSetRegister(data.username, data.email, data.password)
+            .then(token => props.setLogin(token))
     }
 
-    const getForm = () => {
-        const rows = [
-            { id: 'username', name: 'Nombre de Usuario', onblur: 'checkRegister' },
-            { id: 'email', name: 'E-mail', onblur: 'checkRegister' },
-            { id: 'password', name: 'Contraseña', type: 'password' },
-            { id: 'password2', name: 'Repite la contraseña', type: 'password' }
-        ]
-        return <Form rows={rows} />
-    }
+    const rows = [
+        {
+            id: 'username',
+            name: 'Usuario',
+            rules: [
+                { required: true, message: 'El usuario es obligatorio' },
+                { min: 4, message: 'El usuario tiene que ser de 4 caracteres' },
+                { whitespace: true, message: 'No puede estar vacío'},
+                ({ getFieldValue }) => ({
+                    async validator(rule, value) {
+                        const check = await apiCheck('username', value)
+                        if (check) {
+                            return Promise.resolve()
+                        }
+                        return Promise.reject('El usuario ya está registrado')
+                    }
+                })
+            ]
+        },
+        {
+            id: 'email',
+            name: 'E-mail',
+            onblur: 'checkRegister',
+            rules: [
+                { required: true, message: 'El email es obligatorio' },
+                { pattern: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/, message: 'El formato es incorrecto' },
+                { whitespace: true, message: 'No puede estar vacío'},
+                ({ getFieldValue }) => ({
+                    async validator(rule, value) {
+                        const check = await apiCheck('email', value)
+                        if (check) {
+                            return Promise.resolve()
+                        }
+                        return Promise.reject('El email ya está registrado')
+                    }
+                })
+            ]
+        },
+        {
+            id: 'password',
+            name: 'Contraseña',
+            type: 'password',
+            rules: [
+                { required: true, message: 'La contraseña es obligatoria' },
+                { min: 4, message: 'La contraseña tiene que ser de 4 caracteres' },
+                { whitespace: true, message: 'No puede estar vacío'},
+            ]
+        },
+        {
+            id: 'password2',
+            name: 'Repite la Contraseña',
+            type: 'password',
+            rules: [
+                { required: true, message: 'La contraseña es obligatoria' },
+                { min: 4, message: 'La contraseña tiene que ser de 4 caracteres' },
+                { whitespace: true, message: 'No puede estar vacío'},
+                ({ getFieldValue }) => ({
+                    validator(rule, value) {
+                        if (!value || getFieldValue('password') === value) {
+                            return Promise.resolve();
+                        }
+                        return Promise.reject('Las contraseñas no coinciden');
+                    },
+                })
+            ],
+            dependencies: ['password']
+        }
+    ]
+
+
+    const layout = {
+        labelCol: { span: 8 },
+        wrapperCol: { span: 16 },
+    };
 
     return (
-        <div className="form">
-            {getForm()}
-            <div className="row">
-                <button onClick={() => prepareRegister()} >Regístrate</button>
-            </div>
-        </div>
+        <Row justify="space-around">
+            <Col xs={24} md={20} lg={12} xl={8} offset={{ xs: 0, md: 2, lg: 6, xl: 9 }}>
+                <Form {...layout} onFinish={data => doRegister(data)}>
+                    {rows.map(row => (
+                        <Form.Item
+                            hasFeedback
+                            dependencies={row.dependencies}
+                            key={row.id}
+                            label={row.name}
+                            name={row.id}
+                            rules={row.rules}>
+                            {row.type === 'password' ? <Input.Password size="large" /> : <Input size="large" />}
+                        </Form.Item>
+                    ))}
+                    <Form.Item wrapperCol={24}>
+                        <Button type="primary" block size="large" htmlType="submit">Regístrate</Button>
+                    </Form.Item>
+                    <Divider orientation="left">ó bien</Divider>
+                    <NavLink to='/login'><Button block size="large" type="dashed">Inicia Sesión</Button></NavLink>
+                </Form>
+            </Col>
+        </Row>
     )
 }
 
@@ -33,7 +117,7 @@ const mapStateToProps = state => ({
     form: state.form,
 })
 const mapDispatchToProps = (dispatch) => ({
-    setRegister: (username, email, password) => setRegister(dispatch, username, email, password)
+    setLogin: (token) => setLogin(dispatch, token)
 })
 
 const connected = connect(
