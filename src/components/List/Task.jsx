@@ -43,11 +43,11 @@ const TaskList = props => {
         const data = props.task[0] && props.task[0].list ? props.task[0].list : []
 
         return (
-            <List
+            <List key={props.idList}
                 itemLayout="horizontal"
                 dataSource={data}
                 renderItem={task => (
-                    <List.Item>
+                    <List.Item key={task._id}>
                         <List.Item.Meta
                             actions={getActions(task)}
                             title={task.name}

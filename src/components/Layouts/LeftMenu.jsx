@@ -38,7 +38,6 @@ const LeftMenu = props => {
                 .then(done = true)
         }
     }
-    getMenuLists()
 
     const doFilterPanel = (type, id) => {
         props.filterPanel(type, id)

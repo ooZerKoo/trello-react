@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+const apiKey = '00N2M1CqlXX5gdGfmblaZ5SNuffBYsBg-lxa38K5_g0'
+
 export const apiGetapi = (path, id = null) => {
     const base = apiGetBaseUrl()
     switch (path) {
@@ -66,7 +68,7 @@ export const apiCheck = async (type, data) => {
                 check = await axios.post(url + 'checkemail', {
                     email: data
                 })
-                break;
+                break
         }
         return check.data
     } catch (error) {
@@ -79,7 +81,7 @@ export const apiCheck = async (type, data) => {
 export const apiGetPanelList = async (token) => {
     try {
         const url = apiGetapi('panel')
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
         const list = await axios.get(url)
         return list.data
     } catch (error) {
@@ -91,8 +93,19 @@ export const apiGetPanelList = async (token) => {
 export const apiAddPanel = async (token, data) => {
     try {
         const url = apiGetapi('panel')
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
         const panel = await axios.post(url, {...data})
+        return panel.data
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+export const apiUpdatePanel = async (token, data) => {
+    try {
+        const url = apiGetapi('panel', data._id)
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
+        const panel = await axios.put(url, {...data})
         return panel.data
     } catch (error) {
         console.error(error)
@@ -101,7 +114,7 @@ export const apiAddPanel = async (token, data) => {
 
 export const apiDeletePanel = async (token, id) => {
     const url = apiGetapi('panel', id)
-    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
     const panel = await axios.delete(url)
     return panel.data
 }
@@ -109,21 +122,28 @@ export const apiDeletePanel = async (token, id) => {
 // LISTS
 export const apiGetListList = async (token, id) => {
     const url = apiGetapi('list', id)
-    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
     const list = await axios.get(url)
     return list.data
 }
 
 export const apiAddList = async (token, id, data) => {
     const url = apiGetapi('list', id)
-    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
     const list = await axios.post(url, {...data})
+    return list.data
+}
+
+export const apiUpdateList = async (token, id, data) => {
+    const url = apiGetapi('list', id)
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
+    const list = await axios.put(url, {...data})
     return list.data
 }
 
 export const apiDeleteList = async (token, id) => {
     const url = apiGetapi('list', id)
-    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
     const list = await axios.delete(url)
     return list.data
 }
@@ -131,21 +151,28 @@ export const apiDeleteList = async (token, id) => {
 // TASKS
 export const apiGetTaskList = async (token, id) => {
     const url = apiGetapi('task', id)
-    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
     const task = await axios.get(url)
     return task.data
 }
 
 export const apiAddTask = async (token, id, data) => {
     const url = apiGetapi('task', id)
-    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
     const task = await axios.post(url, {...data})
     return task.data
 }
 
 export const apiDeleteTask = async (token, id) => {
     const url = apiGetapi('task', id)
-    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
     const task = await axios.delete(url)
     return task.data
+}
+
+// PHOTOS
+export const apiSearchPhoto = async (search)  => {
+    const url = `https://api.unsplash.com/search/photos?client_id=${apiKey}&query=${search}&orientation=landscape`
+    const photos = await axios.get(url)
+    return photos.data.results
 }

@@ -7,7 +7,7 @@ import { Form, Button, Input, Drawer } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 const { TextArea } = Input;
 
-const PanelForm = props => {
+const TaskForm = props => {
 
     const [form] = Form.useForm();
 
@@ -62,7 +62,7 @@ const PanelForm = props => {
                 </Form.Item>
 
                 <Form.Item wrapperCol={{ span: 24 }}>
-                    <Button type="primary" block size="large" htmlType="submit">Añadir Panel</Button>
+                    <Button type="primary" block size="large" htmlType="submit">Añadir Tarea</Button>
                 </Form.Item>
             </Form>
         </Drawer>
@@ -71,7 +71,6 @@ const PanelForm = props => {
 
 const mapStateToProps = (state) => ({
     token: state.session.user.token,
-    filter: state.menu.filter.panel,
     visible: state.actions.drawers,
 })
 
@@ -83,6 +82,6 @@ const mapDispatchToProps = (dispatch) => ({
 const connected = connect(
     mapStateToProps,
     mapDispatchToProps
-)(PanelForm)
+)(TaskForm)
 
 export default connected

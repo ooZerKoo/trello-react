@@ -1,16 +1,15 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { setPanelList, setVisible } from '../../services/redux/actions.js'
+import { setDrawer, setPanelList, setVisible, setFormData } from '../../services/redux/actions.js'
 import { apiGetPanelList, apiDeletePanel } from '../../services/api/api.js'
 
-import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { Card, Popconfirm, Col } from 'antd'
-import { NavLink } from 'react-router-dom';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { Card, Popconfirm, Col, Empty, Button } from 'antd'
 const { Meta } = Card;
 
 const PanelList = props => {
 
-    const cover = <img alt="example" src="https://gw.alipayobjects.com/zos/rmsportal/JiqGstEfoWAOHiTxclqi.png" />
+    const cover = <img alt="example" src="https://images.unsplash.com/3/doctype-hi-res.jpg?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE4MDI1MX0" />
 
     const getPanelList = async () => {
         apiGetPanelList(props.token)
@@ -22,6 +21,11 @@ const PanelList = props => {
             .then(getPanelList)
     }
 
+    const openDrawerPanel = () => props.setDrawerPanel(true)
+    const openDrawerPanelEdit = (data) => {
+        props.setFormData(data)
+        openDrawerPanel()
+    }
     const showPopconfirm = (id) => props.setVisible(id, true)
     const handleCancel = (id) => props.setVisible(id, false)
 
@@ -38,14 +42,14 @@ const PanelList = props => {
                     onCancel={() => handleCancel(panel._id)}
                     visible={current.visible}
                 >
-                    <DeleteOutlined key="edit" onClick={() => showPopconfirm(panel._id)} />
+                    <DeleteOutlined key="delete" onClick={() => showPopconfirm(panel._id)} />
                 </Popconfirm>
                 ,
-                <NavLink to={'/' + panel._id}><EyeOutlined key="ellipsis" /></NavLink>,
+                <EditOutlined key="edit" onClick={() => openDrawerPanelEdit(panel)} />
             ]
             return (
                 <Col key={panel._id} xs={24} sm={12} md={12} lg={8} xl={6} xxl={4}>
-                    <Card key={panel._id+'_cart'} cover={cover} actions={actions}>
+                    <Card key={panel._id} cover={panel.cover ? <img alt={panel.name} src={panel.cover.small} /> : cover} actions={actions}>
                         <Meta title={panel.name} description={panel.description} />
                     </Card>
                 </Col >
@@ -53,7 +57,16 @@ const PanelList = props => {
         }
     }
 
-    return (<React.Fragment>{renderPanels()}</React.Fragment>)
+    if (props.panels.length > 0) {
+        return <React.Fragment>{renderPanels()}</React.Fragment>
+    }
+    return (
+        <Col span={24}>
+            <Empty description='No hay ningún panel creado'>
+                <Button type="primary" onClick={() => openDrawerPanel('addPanel')}><PlusOutlined /> Añade una Panel</Button>
+            </Empty>
+        </Col>
+    )
 }
 
 const mapStateToProps = (state) => ({
@@ -65,6 +78,8 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     setPanelList: (list) => setPanelList(dispatch, list),
     setVisible: (id, value) => setVisible(dispatch, id, value),
+    setDrawerPanel: (value) => setDrawer(dispatch, 'addPanel', value),
+    setFormData: (data) => setFormData(dispatch, data),
 })
 
 const connected = connect(

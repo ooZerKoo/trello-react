@@ -97,7 +97,8 @@ const initialStateMenu = {
         panel: null,
         list: null,
     },
-    theme: 'dark'
+    theme: 'dark',
+    data: null,
 }
 
 const menu = (state = initialStateMenu, action) => {
@@ -125,17 +126,20 @@ const menu = (state = initialStateMenu, action) => {
                     list: action.payload,
                 }
             }
-        
+        case 'SET_FORM_DATA':
+            return {
+                ...state,
+                data: action.payload
+            }
         case 'SET_PANEL':
         case 'SET_LIST_LIST':
         case 'SET_TASK':
         case 'RESET_MENU_FILTER':
+        case 'DELETE_ALL_PHOTOS':
             return {
                 ...state,
-                filter: {
-                    panel: null,
-                    list: null,
-                }
+                filter: initialStateMenu.filter,
+                data: initialStateMenu.data,
             }
 
         default:
@@ -145,7 +149,9 @@ const menu = (state = initialStateMenu, action) => {
 
 const initialStateActions = {
     actions: [],
-    drawers: []
+    drawers: [],
+    photos: [],
+    photo: null,
 }
 
 const actions = (state = initialStateActions, action) => {
@@ -164,8 +170,25 @@ const actions = (state = initialStateActions, action) => {
                     ...state,
                     drawers: drawers
                 }
-                default:
-                    return state
+            case 'SEARCH_PHOTOS':
+                return {
+                    ...state,
+                    photos: action.payload
+                }
+            case 'SET_PHOTO':
+                return {
+                    ...state,
+                    photo: action.payload,
+                    photos: [],
+                }
+            case 'SET_PANEL':
+            case 'SET_LIST_LIST':
+            case 'SET_TASK':
+            case 'RESET_MENU_FILTER':
+            case 'DELETE_ALL_PHOTOS':
+                return initialStateActions
+            default:
+                return state
     }
 }
 

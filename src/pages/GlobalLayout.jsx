@@ -54,10 +54,12 @@ const GlobalLayout = props => {
                 )
             case '/:idPanel':
                 const panelName = props.panel && props.panel.name ? props.panel.name : ''
+                const panelDescription = props.panel && props.panel.description ? props.panel.description : ''
                 return (
                     <React.Fragment>
                         <Col span={24}>
                             <Title>{panelName}</Title>
+                            <h2>{panelDescription}</h2>
                         </Col>
                         <List idPanel={props.idPanel} />
                     </React.Fragment>
@@ -78,7 +80,7 @@ const GlobalLayout = props => {
                         })}
                     </Header>
                     <Content className="site-layout-background" style={{ margin: '24px 16px', padding: 24, minHeight: 'calc(100vh - 112px)', }}>
-                        <Row gutter={[16, 16]} align="middle">
+                        <Row gutter={[16, 16]}>
                             {getPage()}
                         </Row>
                     </Content>

@@ -28,7 +28,6 @@ export const addPanelList = (dispatch, panels) => {
         payload: panels
     })
 }
-
 export const deletePanel = (dispatch, panel) => {
     return dispatch({
         type: 'DELETE_PANEL',
@@ -131,5 +130,26 @@ export const setDrawer = (dispatch, id, value) => {
             id: id,
             visible: value
         }
+    })
+}
+
+export const setPhoto = (dispatch, urls) => {
+    return dispatch({
+        type: 'SET_PHOTO',
+        payload: urls,
+    })
+}
+
+export const setPhotos = (dispatch, list) => {
+    return dispatch({
+        type: 'SEARCH_PHOTOS',
+        payload: list,
+    })
+}
+
+export const setFormData = (dispatch, data) => {
+    return dispatch({
+        type: 'SET_FORM_DATA',
+        payload: data
     })
 }

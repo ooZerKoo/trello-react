@@ -10,12 +10,12 @@
   color: #1890ff;
 }
 
-#components-layout-demo-custom-trigger .logo {
-  height: 32px;
-  background: rgba(255, 255, 255, 0.3);
-  margin: 16px;
+
+.ant-layout-header.site-layout-background {
+  background: #fff;
 }
 
-.site-layout .site-layout-background {
-  background: #fff;
+#addButton {
+  height: 250px;
+  width: 100%;
 }
