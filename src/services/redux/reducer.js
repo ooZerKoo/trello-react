@@ -1,59 +1,89 @@
-import {
-    combineReducers
-} from 'redux'
-import {
-    sessionReducer
-} from "redux-react-session"
+import { combineReducers } from 'redux'
+import { sessionReducer } from "redux-react-session"
 
+const initialPanel = [false]
+const initialList = [false]
+const initialTask = [false]
 
-const panel = (state = [], action) => {
+const panel = (state = initialPanel, action) => {
+    var add, final
     switch (action.type) {
         case 'SET_PANEL':
             return action.payload
+        case 'DELETE_PANEL':
+            final = state.filter(v => v.id !== action.payload)
+            return final
         case 'ADD_PANEL':
-            var add = state
-            add.push(action.payload)
+            if (state[0] === false) {
+                add = [action.payload]
+            } else {
+                add = state
+                add.push(action.payload)
+            }
             return add
         default:
             return state
     }
 }
 
-const list = (state = [], action) => {
+const list = (state = initialList, action) => {
+    var add, final, current
     switch (action.type) {
-        case 'SET_LIST':
+        case 'SET_LIST_LIST':
             return action.payload
+
         case 'ADD_LIST':
-            var add = state
-            add.push(action.payload)
+            if (state[0] === false) {
+                add = [action.payload]
+            } else {
+                add = state
+                add.push(action.payload)
+            }
             return add
+
+        case 'ADD_ELEMENT_LIST':
+            if (state[0] === false) {
+                final = [action.payload]
+            } else {
+                final = state.filter(v => v.id !== action.payload.id)
+                current = state.filter(v => v.id === action.payload.id)
+                if (current.length === 0) {
+                    current = action.payload
+                } else {
+                    current[0].list.push(action.payload.list)
+                }
+                final.push(current[0])
+            }
+            return final
         default:
             return state
     }
 }
 
-const task = (state = [], action) => {
+const task = (state = initialTask, action) => {
+    var final, current
     switch (action.type) {
         case 'SET_TASK':
-            var final = state.filter(v => v.id !== action.payload.id)
-            final.push(action.payload)
+            if (state[0] === false) {
+                final = [action.payload]
+            } else {
+                final = state.filter(v => v.id !== action.payload.id)
+                final.push(action.payload)
+            }
             return final
 
         case 'ADD_TASK':
-            final = state.filter(v => v.id !== action.payload.list)
-            var add = state.filter(v => v.id === action.payload.list)
-            if (!add[0]) {
-                add = {
-                    id: action.payload.list,
-                    list: [action.payload]
+            if (state[0] === false) {
+                final = [action.payload]
+            } else {
+                final = state.filter(v => v.id !== action.payload.id)
+                current = state.filter(v => v.id === action.payload.id)
+                if (current.length === 0) {
+                    current = [action.payload]
+                } else {
+                    current[0].list.push(action.payload.list)
                 }
-            } else {
-                add[0].list.push(action.payload)
-            }
-            if (!final[0]) {
-                final = [add[0]]
-            } else {
-                final.push(add[0])
+                final.push(current[0])
             }
             return final
         default:
@@ -77,24 +107,39 @@ const menu = (state = initialStateMenu, action) => {
                 ...state,
                 collapsed: state.collapsed ? false : true
             }
-            case 'MENU_FILTER_PANEL':
-                return {
-                    ...state,
-                    filter: {
-                        panel: action.payload,
-                        list: null,
-                    }
+
+        case 'MENU_FILTER_PANEL':
+            return {
+                ...state,
+                filter: {
+                    panel: action.payload,
+                    list: null,
                 }
-                case 'MENU_FILTER_LIST':
-                    return {
-                        ...state,
-                        filter: {
-                            panel: null,
-                            list: action.payload,
-                        }
-                    }
-                    default:
-                        return state
+            }
+
+        case 'MENU_FILTER_LIST':
+            return {
+                ...state,
+                filter: {
+                    panel: null,
+                    list: action.payload,
+                }
+            }
+        
+        case 'SET_PANEL':
+        case 'SET_LIST_LIST':
+        case 'SET_TASK':
+        case 'RESET_MENU_FILTER':
+            return {
+                ...state,
+                filter: {
+                    panel: null,
+                    list: null,
+                }
+            }
+
+        default:
+            return state
     }
 }
 
@@ -125,11 +170,11 @@ const actions = (state = initialStateActions, action) => {
 }
 
 const reducer = combineReducers({
-    panel,
-    list,
-    menu,
-    task,
-    actions,
+    panel: panel,
+    list: list,
+    task: task,
+    menu: menu,
+    actions: actions,
     session: sessionReducer,
 });
 

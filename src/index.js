@@ -9,13 +9,7 @@ import './index.scss';
 import 'antd/dist/antd.css';
 
 sessionService.loadSession()
-  .then(token => {
-    if (token && token.token) {
-      sessionService.saveUser({ token: token.token })
-    } else {
-      console.log('Else index.js');
-    }
-  })
+  .then(token => sessionService.saveUser({ token: token.token }))
   .catch(console.info)
 
 

@@ -15,7 +15,7 @@ export const setLogout = async (dispatch) => {
         .then(sessionService.deleteUser())
 }
 
-// LISTS
+// PANELS
 export const setPanelList = (dispatch, panels) => {
     return dispatch({
         type: 'SET_PANEL',
@@ -29,9 +29,18 @@ export const addPanelList = (dispatch, panels) => {
     })
 }
 
+export const deletePanel = (dispatch, panel) => {
+    return dispatch({
+        type: 'DELETE_PANEL',
+        payload: panel._id
+    })
+}
+
+
+// LIST
 export const setListList = (dispatch, id, list) => {
     return dispatch({
-        type: 'SET_LIST',
+        type: 'SET_LIST_LIST',
         payload: [{
             id: id,
             list: list
@@ -47,7 +56,23 @@ export const addListList = (dispatch, id, list) => {
         }
     })
 }
+export const deleteList = (dispatch, list) => {
+    return dispatch({
+        type: 'DELETE_LIST',
+        payload: list._id
+    })
+}
+export const addElementList = (dispatch, id, list) => {
+    return dispatch({
+        type: 'ADD_ELEMENT_LIST',
+        payload: {
+            id: id,
+            list: list
+        }
+    })
+}
 
+// TASKS
 export const setTaskList = (dispatch, id, list) => {
     return dispatch({
         type: 'SET_TASK',
@@ -58,10 +83,18 @@ export const setTaskList = (dispatch, id, list) => {
     })
 }
 export const addTaskList = (dispatch, id, list) => {
-    console.log(list);
     return dispatch({
         type: 'ADD_TASK',
-        payload: list
+        payload: {
+            id: id,
+            list: list
+        }
+    })
+}
+export const deleteTask = (dispatch, list) => {
+    return dispatch({
+        type: 'DELETE_TASK',
+        payload: list._id
     })
 }
 

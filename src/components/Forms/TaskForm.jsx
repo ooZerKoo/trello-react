@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { addTaskList, setDrawer } from '../../services/redux/actions.js'
-import { apiAddTask } from '../../services/api/api.js'
+import { setDrawer, setTaskList } from '../../services/redux/actions.js'
+import { apiAddTask, apiGetTaskList } from '../../services/api/api.js'
 
 import { Form, Button, Input, Drawer } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
@@ -9,23 +9,25 @@ const { TextArea } = Input;
 
 const PanelForm = props => {
 
+    const [form] = Form.useForm();
+
     const addNewTask = async (data) => {
         apiAddTask(props.token, props.idList, { name: data.name, description: data.description })
-            .then(task => {
-                console.log(task)
-                return props.addTaskList(props.idList, task)
-            })
+            .then(() => apiGetTaskList(props.token, props.idList))
+            .then(list => props.setTaskList(props.idList, list))
+            .then(props.setDrawerTask(props.idList, false))
+            .then(form.resetFields())
     }
 
-    const onCloseDrawer = () => {
-        props.setDrawer(props.idList, false)
+    const onCloseDrawerTask = () => {
+        props.setDrawerTask(props.idList, false)
     }
     
-    const openDrawer = () => {
-        props.setDrawer(props.idList, true)
+    const openDrawerTask = () => {
+        props.setDrawerTask(props.idList, true)
     }
 
-    const getVisible = () => {
+    const getVisibleTask = () => {
         const check = props.visible.filter(v => v.id === props.idList)
         if (check && check[0] && check[0].visible) {
             return check[0].visible
@@ -35,15 +37,15 @@ const PanelForm = props => {
 
 
     return <React.Fragment>
-        <PlusOutlined key="ellipsis" onClick={() => openDrawer()} />
+        <PlusOutlined key="ellipsis" onClick={() => openDrawerTask()} />
         <Drawer
             width={640}
             placement="right"
             closable={true}
-            onClose={() => onCloseDrawer()}
-            visible={getVisible(props.idList)}
+            onClose={() => onCloseDrawerTask()}
+            visible={getVisibleTask()}
         >
-            <Form labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => addNewTask(data)}>
+            <Form form={form} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => addNewTask(data)}>
                 <Form.Item
                     hasFeedback
                     label='Nombre'
@@ -74,8 +76,8 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-    addTaskList: (id, list) => addTaskList(dispatch, id, list),
-    setDrawer: (id, value) => setDrawer(dispatch, id, value)
+    setTaskList: (id, list) => setTaskList(dispatch, id, list),
+    setDrawerTask: (id, value) => setDrawer(dispatch, id, value)
 })
 
 const connected = connect(

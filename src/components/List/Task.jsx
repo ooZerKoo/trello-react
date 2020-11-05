@@ -4,7 +4,7 @@ import { setTaskList, setVisible } from '../../services/redux/actions.js'
 import { apiDeleteTask, apiGetTaskList, } from '../../services/api/api.js'
 
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
-import { Popconfirm, List, Avatar } from 'antd'
+import { Popconfirm, List } from 'antd'
 import { NavLink } from 'react-router-dom';
 
 const TaskList = props => {

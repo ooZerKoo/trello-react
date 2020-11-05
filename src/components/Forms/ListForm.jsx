@@ -1,26 +1,44 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { setListList } from '../../services/redux/actions.js'
-import { apiGetListList, apiAddList } from '../../services/api/api.js'
-import { Form, Button, Col, Input } from 'antd'
+import { setListList, setDrawer } from '../../services/redux/actions.js'
+import { apiAddList, apiGetListList } from '../../services/api/api.js'
+import { Form, Button, Drawer, Input } from 'antd'
 const { TextArea } = Input;
 
 const ListForm = props => {
 
-    const getListList = async () => {
-        apiGetListList(props.token, props.idPanel)
-            .then(list => props.setListList(props.idPanel, list))
-    }
+    const [form] = Form.useForm();
 
     const addNewList = async (data) => {
         apiAddList(props.token, props.idPanel, { name: data.name, description: data.description })
-            .then(getListList)
+            .then(() => apiGetListList(props.token, props.idPanel))
+            .then(list => props.setListList(props.idPanel, list))
+            .then(props.setDrawerList(props.idPanel, false))
+            .then(form.resetFields())
     }
 
-    if (props.filter === 'form') {
+    const onCloseDrawerList = () => {
+        props.setDrawerList(props.idPanel, false)
+    }
+
+    const getVisibleList = () => {
+        const check = props.visible.filter(v => v.id === props.idPanel)
+        if (check && check[0] && check[0].visible) {
+            return check[0].visible
+        }
+        return false
+    }
+
+    
         return (
-            <Col xs={24} sm={12} md={12} lg={8} xl={6} xxl={4}>
-                <Form labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => addNewList(data)}>
+            <Drawer
+            width={640}
+            placement="right"
+            closable={true}
+            onClose={() => onCloseDrawerList()}
+            visible={getVisibleList()}
+        >
+                <Form form={form} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => addNewList(data)}>
                     <Form.Item
                         hasFeedback
                         label='Nombre'
@@ -40,22 +58,21 @@ const ListForm = props => {
                         <Button type="primary" block size="large" htmlType="submit">Añadir Lista</Button>
                     </Form.Item>
                 </Form>
-            </Col>
+            </Drawer>
         )
-    }
-    else {
-        return <React.Fragment></React.Fragment>
-    }
+    
 }
 
 const mapStateToProps = (state, extraVars) => ({
     idPanel: extraVars.idPanel,
     token: state.session.user.token,
-    filter: state.menu.filter.list
+    filter: state.menu.filter.list,
+    visible: state.actions.drawers,
 })
 
 const mapDispatchToProps = (dispatch) => ({
     setListList: (id, list) => setListList(dispatch, id, list),
+    setDrawerList: (id, value) => setDrawer(dispatch, id, value)
 })
 
 const connected = connect(

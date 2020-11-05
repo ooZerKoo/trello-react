@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { setListList, setVisible, filterPanel } from '../../services/redux/actions.js'
+import { setListList, setVisible, setDrawer } from '../../services/redux/actions.js'
 import { apiDeleteList, apiGetListList } from '../../services/api/api.js'
 
 import TaskList from '../../components/List/Task'
@@ -25,8 +25,8 @@ const ListList = props => {
             .then(getListList)
     }
 
-    const doFilterPanel = () => {
-        props.filterPanel('list', 'form')
+    const openDrawerMenu = () => {
+        props.setDrawerList(props.idPanel, true)
     }
 
     const showPopconfirm = (id) => props.setVisible(id, true)
@@ -67,7 +67,7 @@ const ListList = props => {
             return (
                 <Col xs={24} sm={12} md={12} lg={8} xl={6} xxl={4}>
                     <Badge.Ribbon color="green" text="Añade una lista nueva">
-                        <Card cover={cover} actions={[<PlusOutlined key="add" onClick={() => doFilterPanel()} />]}>
+                        <Card cover={cover} actions={[<PlusOutlined key="add" onClick={() => openDrawerMenu()} />]}>
                             <Meta title='Añade una lista' description='En este panel no tienes ninguna lista creada' />
                         </Card>
                     </Badge.Ribbon>
@@ -100,7 +100,7 @@ const mapStateToProps = (state, extra) => ({
 const mapDispatchToProps = (dispatch) => ({
     setListList: (id, list) => setListList(dispatch, id, list),
     setVisible: (id, value) => setVisible(dispatch, id, value),
-    filterPanel: (type, id) => filterPanel(dispatch, type, id)
+    setDrawerList: (id, value) => setDrawer(dispatch, id, value),
 })
 
 const connected = connect(

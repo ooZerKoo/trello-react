@@ -25,7 +25,9 @@ const PanelList = props => {
     const showPopconfirm = (id) => props.setVisible(id, true)
     const handleCancel = (id) => props.setVisible(id, false)
 
-    const renderPanels = (panel) => {
+    const renderPanels = () => props.panels.map(panel => renderPanel(panel))
+
+    const renderPanel = (panel) => {
         if (!props.filter || props.filter === panel._id) {
             const currentArray = props.actions.filter(v => v.id === panel._id)
             const current = currentArray[0] ? currentArray[0] : { visible: false }
@@ -43,7 +45,7 @@ const PanelList = props => {
             ]
             return (
                 <Col key={panel._id} xs={24} sm={12} md={12} lg={8} xl={6} xxl={4}>
-                    <Card key={panel._id} cover={cover} actions={actions}>
+                    <Card key={panel._id+'_cart'} cover={cover} actions={actions}>
                         <Meta title={panel.name} description={panel.description} />
                     </Card>
                 </Col >
@@ -51,7 +53,7 @@ const PanelList = props => {
         }
     }
 
-    return (<React.Fragment>{props.panels.map(panel => (renderPanels(panel)))}</React.Fragment>)
+    return (<React.Fragment>{renderPanels()}</React.Fragment>)
 }
 
 const mapStateToProps = (state) => ({
