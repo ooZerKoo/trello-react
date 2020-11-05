@@ -1,5 +1,9 @@
-import { combineReducers } from 'redux'
-import { sessionReducer } from "redux-react-session"
+import {
+    combineReducers
+} from 'redux'
+import {
+    sessionReducer
+} from "redux-react-session"
 
 
 const panel = (state = [], action) => {
@@ -31,11 +35,27 @@ const list = (state = [], action) => {
 const task = (state = [], action) => {
     switch (action.type) {
         case 'SET_TASK':
-            return action.payload
+            var final = state.filter(v => v.id !== action.payload.id)
+            final.push(action.payload)
+            return final
+
         case 'ADD_TASK':
-            var add = state
-            add.push(action.payload)
-            return add
+            final = state.filter(v => v.id !== action.payload.list)
+            var add = state.filter(v => v.id === action.payload.list)
+            if (!add[0]) {
+                add = {
+                    id: action.payload.list,
+                    list: [action.payload]
+                }
+            } else {
+                add[0].list.push(action.payload)
+            }
+            if (!final[0]) {
+                final = [add[0]]
+            } else {
+                final.push(add[0])
+            }
+            return final
         default:
             return state
     }
@@ -57,29 +77,30 @@ const menu = (state = initialStateMenu, action) => {
                 ...state,
                 collapsed: state.collapsed ? false : true
             }
-        case 'MENU_FILTER_PANEL':
-            return {
-                ...state,
-                filter: {
-                    panel: action.payload,
-                    list: null,
+            case 'MENU_FILTER_PANEL':
+                return {
+                    ...state,
+                    filter: {
+                        panel: action.payload,
+                        list: null,
+                    }
                 }
-            }
-        case 'MENU_FILTER_LIST':
-            return {
-                ...state,
-                filter: {
-                    panel: null,
-                    list: action.payload,
-                }
-            }
-        default:
-            return state
+                case 'MENU_FILTER_LIST':
+                    return {
+                        ...state,
+                        filter: {
+                            panel: null,
+                            list: action.payload,
+                        }
+                    }
+                    default:
+                        return state
     }
 }
 
 const initialStateActions = {
     actions: [],
+    drawers: []
 }
 
 const actions = (state = initialStateActions, action) => {
@@ -91,8 +112,15 @@ const actions = (state = initialStateActions, action) => {
                 ...state,
                 actions: actionVisible
             }
-        default:
-            return state
+            case 'SET_DRAWER':
+                const drawers = state.drawers.filter(v => v.id !== action.payload.id)
+                drawers.push(action.payload)
+                return {
+                    ...state,
+                    drawers: drawers
+                }
+                default:
+                    return state
     }
 }
 

@@ -51,19 +51,17 @@ export const addListList = (dispatch, id, list) => {
 export const setTaskList = (dispatch, id, list) => {
     return dispatch({
         type: 'SET_TASK',
-        payload: [{
-            id: id,
-            list: list
-        }]
-    })
-}
-export const addTaskList = (dispatch, id, list) => {
-    return dispatch({
-        type: 'ADD_TASK',
         payload: {
             id: id,
             list: list
         }
+    })
+}
+export const addTaskList = (dispatch, id, list) => {
+    console.log(list);
+    return dispatch({
+        type: 'ADD_TASK',
+        payload: list
     })
 }
 
@@ -86,6 +84,16 @@ export const filterPanel = (dispatch, type, id) => {
 export const setVisible = (dispatch, id, value) => {
     return dispatch({
         type: 'SET_ACTION_VISIBLE',
+        payload: {
+            id: id,
+            visible: value
+        }
+    })
+}
+
+export const setDrawer = (dispatch, id, value) => {
+    return dispatch({
+        type: 'SET_DRAWER',
         payload: {
             id: id,
             visible: value

@@ -50,7 +50,6 @@ const TaskList = props => {
                     <List.Item>
                         <List.Item.Meta
                             actions={getActions(task)}
-                            avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />}
                             title={task.name}
                             description={task.description}
                         />

@@ -4,11 +4,12 @@ import { setListList, setVisible, filterPanel } from '../../services/redux/actio
 import { apiDeleteList, apiGetListList } from '../../services/api/api.js'
 
 import TaskList from '../../components/List/Task'
+import TaskForm from '../../components/Forms/TaskForm'
 
-import { DeleteOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons'
 import { Card, Popconfirm, Col, Badge } from 'antd'
-import { NavLink } from 'react-router-dom';
-const { Meta } = Card;
+
+const { Meta } = Card
 
 const ListList = props => {
 
@@ -45,12 +46,12 @@ const ListList = props => {
                     <DeleteOutlined key="edit" onClick={() => showPopconfirm(list._id)} />
                 </Popconfirm>
                 ,
-                <NavLink to={'/' + list._id}><EyeOutlined key="ellipsis" /></NavLink>,
+                <TaskForm idList={list._id} />,
             ]
 
             return (
                 <Col key={list._id} xs={24} sm={12} md={12} lg={8} xl={6} xxl={4}>
-                    {<Card key={list._id} cover={cover} actions={actions}>
+                    {<Card key={list._id} actions={actions}>
                         <React.Fragment>
                             <Meta title={list.name} description={list.description} />
                             <TaskList idList={list._id} />

@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 
 import { apiGetListList, apiGetPanelList, apiGetTaskList } from './../services/api/api.js'
-import { setPanelList, addListList, addTaskList, toggleCollapse } from '../services/redux/actions.js'
+import { setPanelList, setListList, setTaskList, toggleCollapse } from '../services/redux/actions.js'
 
 import LeftMenu from '../components/Layouts/LeftMenu.jsx'
 
@@ -127,8 +127,8 @@ const mapSateToProps = (state, extra) => ({
 const mapDispatchToProps = dispatch => ({
     toggleCollapse: () => toggleCollapse(dispatch),
     menuSetPanelList: (panels) => setPanelList(dispatch, panels),
-    menuSetListList: (idPanel, list) => addListList(dispatch, idPanel, list),
-    menuSetTaskList: (idList, tasks) => addTaskList(dispatch, idList, tasks),
+    menuSetListList: (idPanel, list) => setListList(dispatch, idPanel, list),
+    menuSetTaskList: (idList, tasks) => setTaskList(dispatch, idList, tasks),
 })
 
 const connected = connect(mapSateToProps, mapDispatchToProps)(GlobalLayout)

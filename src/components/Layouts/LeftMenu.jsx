@@ -59,7 +59,6 @@ const LeftMenu = props => {
     const renderLinePanel = (panel) => {
         const lists = props.lists.filter(v => v.id === panel._id)
         const finalData = lists[0] && lists[0].list ? lists[0].list : []
-        console.log(finalData);
         var cont = 0
         return (
             <SubMenu key={panel._id + '_0'} title={<span><FolderOutlined /><span>{panel.name}</span></span>}>
