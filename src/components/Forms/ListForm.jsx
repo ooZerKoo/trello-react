@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { setListList, setDrawer } from '../../services/redux/actions.js'
+import { setListList, setDrawer, setFormData } from '../../services/redux/actions.js'
 import { apiAddList, apiGetListList, apiUpdateList } from '../../services/api/api.js'
 
 import ImageForm from './ImageForm'
@@ -25,13 +25,13 @@ const ListForm = props => {
         apiUpdateList(props.token, props.idPanel, update)
             .then(() => apiGetListList(props.token, props.idPanel))
             .then(list => props.setListList(props.idPanel, list))
-            .then(props.setDrawerList(props.idPanel, false))
+            .then(() => props.setDrawerList(props.idPanel, false))
+            .then(() => props.emptyFormData())
             .then(form.resetFields())
     }
 
-    const onCloseDrawerList = () => {
-        props.setDrawerList(props.idPanel, false)
-    }
+    const resetFields = (data) => form.resetFields()
+    const onCloseDrawerList = () => props.setDrawerList(props.idPanel, false)
 
     const getVisibleList = () => {
         const check = props.visible.filter(v => v.id === props.idPanel)
@@ -60,7 +60,7 @@ const ListForm = props => {
             onClose={() => onCloseDrawerList()}
             visible={getVisibleList()}
         >
-            <Form form={form} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => props.form ? editList(data) : addNewList(data)} initialValues={props.form}>
+            <Form form={form} onLoad={data => resetFields(data)} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => props.form ? editList(data) : addNewList(data)} initialValues={props.form ? props.form : {}}>
                 {getPhoto()}
                 <Form.Item
                     hasFeedback
@@ -98,7 +98,8 @@ const mapStateToProps = (state, extraVars) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     setListList: (id, list) => setListList(dispatch, id, list),
-    setDrawerList: (id, value) => setDrawer(dispatch, id, value)
+    setDrawerList: (id, value) => setDrawer(dispatch, id, value),
+    emptyFormData: () => setFormData(dispatch, null),
 })
 
 const connected = connect(

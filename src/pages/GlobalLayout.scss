@@ -15,7 +15,24 @@
   background: #fff;
 }
 
-#addButton {
-  height: 250px;
+img {
   width: 100%;
+}
+
+.listSize {
+  position: absolute;
+  top: calc(100% - 75px);
+  background: white;
+  padding: 5px 25px;
+  transition: 0.3s ease all;
+  opacity: 0;
+  width: 100%;
+}
+
+.listCover {
+  position: relative;
+}
+
+.listCover:hover .listSize {
+  opacity: 1;
 }

@@ -94,7 +94,9 @@ export const apiAddPanel = async (token, data) => {
     try {
         const url = apiGetapi('panel')
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
-        const panel = await axios.post(url, {...data})
+        const panel = await axios.post(url, {
+            ...data
+        })
         return panel.data
     } catch (error) {
         console.error(error)
@@ -105,7 +107,9 @@ export const apiUpdatePanel = async (token, data) => {
     try {
         const url = apiGetapi('panel', data._id)
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
-        const panel = await axios.put(url, {...data})
+        const panel = await axios.put(url, {
+            ...data
+        })
         return panel.data
     } catch (error) {
         console.error(error)
@@ -130,14 +134,27 @@ export const apiGetListList = async (token, id) => {
 export const apiAddList = async (token, id, data) => {
     const url = apiGetapi('list', id)
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
-    const list = await axios.post(url, {...data})
+    const list = await axios.post(url, {
+        ...data
+    })
     return list.data
 }
 
 export const apiUpdateList = async (token, id, data) => {
     const url = apiGetapi('list', id)
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
-    const list = await axios.put(url, {...data})
+    const list = await axios.put(url, {
+        ...data
+    })
+    return list.data
+}
+
+export const apiUpdateListPosition = async (token, id, position) => {
+    const url = apiGetapi('list')
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
+    const list = await axios.put(url + '/position/' + id, {
+        position: position
+    })
     return list.data
 }
 
@@ -159,7 +176,9 @@ export const apiGetTaskList = async (token, id) => {
 export const apiAddTask = async (token, id, data) => {
     const url = apiGetapi('task', id)
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
-    const task = await axios.post(url, {...data})
+    const task = await axios.post(url, {
+        ...data
+    })
     return task.data
 }
 
@@ -171,7 +190,7 @@ export const apiDeleteTask = async (token, id) => {
 }
 
 // PHOTOS
-export const apiSearchPhoto = async (search)  => {
+export const apiSearchPhoto = async (search) => {
     const url = `https://api.unsplash.com/search/photos?client_id=${apiKey}&query=${search}&orientation=landscape`
     const photos = await axios.get(url)
     return photos.data.results

@@ -48,7 +48,7 @@ const PanelList = props => {
                 <EditOutlined key="edit" onClick={() => openDrawerPanelEdit(panel)} />
             ]
             return (
-                <Col key={panel._id} xs={24} sm={12} md={12} lg={8} xl={6} xxl={4}>
+                <Col key={'panelList_'+panel._id} xs={24} sm={12} md={12} lg={8} xl={6} xxl={4}>
                     <Card key={panel._id} cover={panel.cover ? <img alt={panel.name} src={panel.cover.small} /> : cover} actions={actions}>
                         <Meta title={panel.name} description={panel.description} />
                     </Card>
@@ -61,7 +61,7 @@ const PanelList = props => {
         return <React.Fragment>{renderPanels()}</React.Fragment>
     }
     return (
-        <Col span={24}>
+        <Col span={24} key='panelList'>
             <Empty description='No hay ningún panel creado'>
                 <Button type="primary" onClick={() => openDrawerPanel('addPanel')}><PlusOutlined /> Añade una Panel</Button>
             </Empty>

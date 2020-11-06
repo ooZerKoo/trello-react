@@ -28,7 +28,7 @@ const GlobalLayout = props => {
             case '/login':
                 return (
                     <React.Fragment>
-                        <Col span={24}>
+                        <Col span={24} key='login'>
                             <Title>Iniciar Sesión</Title>
                             <Login />
                         </Col>
@@ -37,7 +37,7 @@ const GlobalLayout = props => {
             case '/register':
                 return (
                     <React.Fragment>
-                        <Col span={24}>
+                        <Col span={24} key='register'>
                             <Title>Regístrate</Title>
                             <Register />
                         </Col>
@@ -46,7 +46,7 @@ const GlobalLayout = props => {
             case '/':
                 return (
                     <React.Fragment>
-                        <Col span={24}>
+                        <Col span={24} key='paneles'>
                             <Title>Paneles</Title>
                         </Col>
                         <Panel />
@@ -57,11 +57,11 @@ const GlobalLayout = props => {
                 const panelDescription = props.panel && props.panel.description ? props.panel.description : ''
                 return (
                     <React.Fragment>
-                        <Col span={24}>
+                        <Col span={24} key='panelTitle'>
                             <Title>{panelName}</Title>
                             <h2>{panelDescription}</h2>
                         </Col>
-                        <List idPanel={props.idPanel} />
+                        <List id='listContent' idPanel={props.idPanel} />
                     </React.Fragment>
                 )
 

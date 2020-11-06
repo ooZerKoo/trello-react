@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { setDrawer, setPanelList } from '../../services/redux/actions.js'
+import { setDrawer, setPanelList, setFormData } from '../../services/redux/actions.js'
 import { apiAddPanel, apiGetPanelList, apiUpdatePanel } from '../../services/api/api.js'
 
 import ImageForm from './ImageForm'
@@ -26,12 +26,12 @@ const PanelForm = props => {
             .then(() => apiGetPanelList(props.token))
             .then(panels => props.setPanelList(panels))
             .then(() => props.setDrawerPanel('addPanel', false))
+            .then(() => props.emptyFormData())
             .then(() => form.resetFields())
     }
 
-    const onCloseDrawerPanel = () => {
-        props.setDrawerPanel('addPanel', false)
-    }
+    const resetFields = (data) => form.resetFields()
+    const onCloseDrawerPanel = () => props.setDrawerPanel('addPanel', false)
 
     const getVisiblePanel = () => {
         const check = props.visible.filter(v => v.id === 'addPanel')
@@ -60,7 +60,7 @@ const PanelForm = props => {
             onClose={() => onCloseDrawerPanel()}
             visible={getVisiblePanel()}
         >
-            <Form form={form} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => props.form ? editPanel(data) : addNewPanel(data)} initialValues={props.form}>
+            <Form form={form} onLoad={data => resetFields(data)} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => props.form ? editPanel(data) : addNewPanel(data)} initialValues={props.form}>
                 {getPhoto()}
                 <Form.Item
                     hasFeedback
@@ -96,7 +96,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     setPanelList: (list) => setPanelList(dispatch, list),
-    setDrawerPanel: (id, value) => setDrawer(dispatch, id, value)
+    setDrawerPanel: (id, value) => setDrawer(dispatch, id, value),
+    emptyFormData: () => setFormData(dispatch, null),
 })
 
 const connected = connect(
