@@ -20,8 +20,6 @@ const { Title } = Typography
 
 const GlobalLayout = props => {
 
-    const toggleCollapsePanel = () => props.toggleCollapse()
-
     const getPage = () => {
         switch (props.page) {
             default:
@@ -76,7 +74,7 @@ const GlobalLayout = props => {
                     <Header className="site-layout-background" style={{ padding: '0 0 0 25px', textAlign: 'left' }} >
                         {React.createElement(props.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
                             className: 'trigger',
-                            onClick: () => toggleCollapsePanel(),
+                            onClick: () => props.toggleCollapse(),
                         })}
                     </Header>
                     <Content className="site-layout-background" style={{ margin: '24px 16px', padding: 24, minHeight: 'calc(100vh - 112px)', }}>
@@ -92,15 +90,9 @@ const GlobalLayout = props => {
 
 const mapSateToProps = (state, extra) => ({
     collapsed: state.menu.collapsed,
-    auth: state.session.authenticated,
-    token: state.session.user.token,
     page: extra.match.path,
     idPanel: extra.match.params.idPanel,
     panel: state.panel.filter(v => v._id === extra.match.params.idPanel)[0],
-    filters: state.menu.filter,
-    panels: state.panel,
-    lists: state.list,
-    tasks: state.task,
 })
 
 const mapDispatchToProps = dispatch => ({

@@ -2,23 +2,18 @@ import { sessionService } from 'redux-react-session'
 
 // USER
 export const setLogin = async (dispatch, token) => {
-    await sessionService.saveSession({
+    sessionService.saveSession({
             token: token
         })
         .then(sessionService.saveUser({
             token: token
         }))
-    return dispatch({
-        type: 'RESET'
-    })
 }
 
 export const setLogout = async (dispatch) => {
-    await sessionService.deleteSession()
+    sessionService.deleteSession()
         .then(sessionService.deleteUser())
-    return dispatch({
-        type: 'RESET'
-    })
+        .then(() => dispatch({type: 'RESET'}))
 }
 
 // PANELS

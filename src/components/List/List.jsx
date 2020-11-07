@@ -24,7 +24,9 @@ const ListList = props => {
     const handleCancel = (id) => props.setVisible(id, false)
     const openDrawerList = () => props.setDrawerList(props.idPanel, true)
     const openDrawerListEdit = (data) => setListFormData(data).then(() => openDrawerList())
-    const swapDraggable = () => props.swapDraggable()
+    const swapDraggable = () => {
+        if (props.list[0].list.length > 1) props.swapDraggable()
+    }
     const getListCover = (list) => {
         return <Row justify="center">{list.cover ? <img alt={list.name} src={list.cover.small} /> : cover}</Row>
     }
@@ -56,7 +58,7 @@ const ListList = props => {
             </Popconfirm>
             ,
             <EditOutlined key="edit" onClick={() => openDrawerListEdit(list)} />,
-            props.list[0].list.length > 1 ? <DragOutlined onClick={() => swapDraggable()} /> : ''
+            <DragOutlined onClick={() => swapDraggable()}/>
         ]
     }
 
@@ -100,6 +102,7 @@ const ListList = props => {
                             {(provided, snapshot) => (
                                 <Row wrap={true} style={{ paddingTop: '15px' }} justify="center" gutter={[24, 24]} {...provided.droppableProps} ref={provided.innerRef}>
                                     {renderLists()}
+                                    {provided.placeholder}
                                 </Row>
                             )}
                         </Droppable>

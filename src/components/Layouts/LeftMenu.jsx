@@ -10,17 +10,19 @@ import { NavLink } from 'react-router-dom'
 const { Sider } = Layout
 const { SubMenu } = Menu
 
+let done = false
 const LeftMenu = props => {
     const doLogout = () => {
         props.setLogout()
     }
 
     const getMenuLists = async () => {
-        if (props.token && !props.lists[0]) {
+        if (props.token && !props.lists[0] && !done) {
             // get panel
             apiGetPanelList(props.token)
                 // set panel to menu
                 .then(panels => props.menuSetPanelList(panels))
+
                 .then(panels => panels.payload.map(panel =>
                     // get list
                     apiGetListList(props.token, panel._id)
@@ -33,6 +35,8 @@ const LeftMenu = props => {
                                 .then(tasks => props.menuSetTaskList(list._id, tasks))
                         ))
                 ))
+
+            done = true
         }
     }
 
@@ -114,15 +118,23 @@ const LeftMenu = props => {
             </Menu.Item>
         ))
     }
-    getMenuLists()
 
-    return (
-        <Sider collapsible collapsed={props.collapsed}>
-            <div className="logo" />
-            {props.auth && getMenuLogged()}
-            {!props.auth && getMenuNoLogged()}
-        </Sider>
-    )
+    if (props.auth && props.token) {
+        getMenuLists()
+        return (
+            <Sider collapsible collapsed={props.collapsed}>
+                <div className="logo" />
+                {getMenuLogged()}
+            </Sider>
+        )
+    } else {
+        return (
+            <Sider collapsible collapsed={props.collapsed}>
+                <div className="logo" />
+                {getMenuNoLogged()}
+            </Sider>
+        )
+    }
 }
 
 const mapSateToProps = state => ({
