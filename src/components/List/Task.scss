@@ -1,0 +1,9 @@
+.taskDone {
+    opacity: 0.3;
+    text-decoration: line-through;
+    transition: 0.3s ease all;
+}
+.taskDone:hover{
+    text-decoration: none;
+    opacity: 1;
+}

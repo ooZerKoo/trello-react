@@ -5,25 +5,25 @@ import { apiGetPanelList, apiDeletePanel } from '../../services/api/api.js'
 
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { Card, Popconfirm, Col, Empty, Button } from 'antd'
+
 const { Meta } = Card;
 
 const PanelList = props => {
 
-    const cover = <img alt="example" src="https://images.unsplash.com/3/doctype-hi-res.jpg?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE4MDI1MX0" />
+    const coverDefault = {small: "https://images.unsplash.com/3/doctype-hi-res.jpg?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE4MDI1MX0"}
+    const cover = <img src={coverDefault.small} alt="cover" />
 
     const getPanelList = async () => {
         apiGetPanelList(props.token)
             .then(list => props.setPanelList(list))
     }
-
     const deleteOnePanel = (id) => {
         apiDeletePanel(props.token, id)
             .then(getPanelList)
     }
-
     const openDrawerPanel = () => props.setDrawerPanel(true)
     const openDrawerPanelEdit = (data) => {
-        props.setFormData(data)
+        props.setFormDataPanel(data)
         openDrawerPanel()
     }
     const showPopconfirm = (id) => props.setVisible(id, true)
@@ -79,7 +79,7 @@ const mapDispatchToProps = (dispatch) => ({
     setPanelList: (list) => setPanelList(dispatch, list),
     setVisible: (id, value) => setVisible(dispatch, id, value),
     setDrawerPanel: (value) => setDrawer(dispatch, 'addPanel', value),
-    setFormData: (data) => setFormData(dispatch, data),
+    setFormDataPanel: (data) => setFormData(dispatch, data),
 })
 
 const connected = connect(

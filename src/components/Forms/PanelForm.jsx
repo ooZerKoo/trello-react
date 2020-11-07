@@ -17,12 +17,13 @@ const PanelForm = props => {
             .then(() => apiGetPanelList(props.token))
             .then(panels => props.setPanelList(panels))
             .then(() => props.setDrawerPanel('addPanel', false))
+            .then(() => props.emptyFormData())
             .then(() => form.resetFields())
     }
 
     const editPanel = async (data) => {
-        const update = props.photo ? { _id: props.form._id, ...data, cover: props.photo} : { _id: props.form._id, ...data }
-        apiUpdatePanel(props.token, update)
+        const update = props.photo ? {...data, cover: props.photo } : { _id: props.form._id, ...data }
+        apiUpdatePanel(props.token,  props.form._id, update)
             .then(() => apiGetPanelList(props.token))
             .then(panels => props.setPanelList(panels))
             .then(() => props.setDrawerPanel('addPanel', false))
@@ -30,8 +31,19 @@ const PanelForm = props => {
             .then(() => form.resetFields())
     }
 
-    const resetFields = (data) => form.resetFields()
-    const onCloseDrawerPanel = () => props.setDrawerPanel('addPanel', false)
+    const initiateForm = () => {
+        if (!props.form){
+            form.resetFields()
+        }
+        form.setFieldsValue({
+            name: props.form && props.form.name ? props.form.name : '',
+            description: props.form && props.form.description ? props.form.description : '',
+        })
+    }
+    const onCloseDrawerPanel = () => {
+        props.emptyFormData()
+        props.setDrawerPanel('addPanel', false)
+    }
 
     const getVisiblePanel = () => {
         const check = props.visible.filter(v => v.id === 'addPanel')
@@ -60,7 +72,13 @@ const PanelForm = props => {
             onClose={() => onCloseDrawerPanel()}
             visible={getVisiblePanel()}
         >
-            <Form form={form} onLoad={data => resetFields(data)} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => props.form ? editPanel(data) : addNewPanel(data)} initialValues={props.form}>
+            <Form
+                form={form}
+                onLoad={() => initiateForm()}
+                labelCol={{ span: 8 }}
+                wrapperCol={{ span: 16 }}
+                onFinish={data => props.form ? editPanel(data) : addNewPanel(data)}
+            >
                 {getPhoto()}
                 <Form.Item
                     hasFeedback
@@ -68,7 +86,7 @@ const PanelForm = props => {
                     name='name'
                     rules={[
                         { required: true, message: 'El nombre es obligatorio' },
-                        { min: 4, message: 'El nombre tiene que ser de 4 caracteres' },
+                        { min: 1, message: 'El nombre tiene que ser de 4 caracteres' },
                         { whitespace: true, message: 'No puede estar vacío' },
                     ]}>
                     <Input size="large" />

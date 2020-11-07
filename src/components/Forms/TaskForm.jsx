@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { setDrawer, setTaskList } from '../../services/redux/actions.js'
 import { apiAddTask, apiGetTaskList } from '../../services/api/api.js'
 
-import { Form, Button, Input, Drawer } from 'antd'
+import { Form, Button, Input, Col, Divider } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 const { TextArea } = Input;
 
@@ -12,47 +12,48 @@ const TaskForm = props => {
     const [form] = Form.useForm();
 
     const addNewTask = async (data) => {
-        apiAddTask(props.token, props.idList, { name: data.name, description: data.description })
+        apiAddTask(props.token, props.idList, { ...data, status: false })
             .then(() => apiGetTaskList(props.token, props.idList))
             .then(list => props.setTaskList(props.idList, list))
             .then(props.setDrawerTask(props.idList, false))
             .then(form.resetFields())
     }
 
-    const onCloseDrawerTask = () => {
-        props.setDrawerTask(props.idList, false)
-    }
-    
-    const openDrawerTask = () => {
-        props.setDrawerTask(props.idList, true)
+    const toggleTaskForm = () => {
+        const check = props.visible.filter(v => v.id === props.idList)
+        if (!check || !check[0]) {
+            props.setDrawerTask(props.idList, true)
+        } else {
+            props.setDrawerTask(props.idList, !check[0].visible)
+        }
     }
 
     const getVisibleTask = () => {
         const check = props.visible.filter(v => v.id === props.idList)
         if (check && check[0] && check[0].visible) {
-            return check[0].visible
+            return check[0].visible ? 'block' : 'none'
         }
-        return false
+        return 'none'
     }
 
 
-    return <React.Fragment>
-        <PlusOutlined key="ellipsis" onClick={() => openDrawerTask()} />
-        <Drawer
-            width={640}
-            placement="right"
-            closable={true}
-            onClose={() => onCloseDrawerTask()}
-            visible={getVisibleTask()}
-        >
-            <Form form={form} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => addNewTask(data)}>
+    return (
+        <React.Fragment>
+            <Divider />
+            <Col span={24} style={{ textAlign: 'center' }}>
+                <Button onClick={() => toggleTaskForm()} type='dashed'>
+                    <PlusOutlined key="ellipsis"></PlusOutlined> Añade una Tarea
+            </Button>
+            </Col>
+
+            <Form form={form} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => addNewTask(data)} style={{ display: getVisibleTask() }}>
                 <Form.Item
                     hasFeedback
                     label='Nombre'
                     name='name'
                     rules={[
                         { required: true, message: 'El nombre es obligatorio' },
-                        { min: 4, message: 'El nombre tiene que ser de 4 caracteres' },
+                        { min: 1, message: 'No puede estar vacío' },
                         { whitespace: true, message: 'No puede estar vacío' },
                     ]}>
                     <Input size="large" />
@@ -65,8 +66,8 @@ const TaskForm = props => {
                     <Button type="primary" block size="large" htmlType="submit">Añadir Tarea</Button>
                 </Form.Item>
             </Form>
-        </Drawer>
-    </React.Fragment>
+        </React.Fragment>
+    )
 }
 
 const mapStateToProps = (state) => ({

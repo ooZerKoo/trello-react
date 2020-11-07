@@ -30,7 +30,9 @@ const ListForm = props => {
             .then(form.resetFields())
     }
 
-    const resetFields = (data) => form.resetFields()
+    const resetFields = () => {
+        form.resetFields()
+    }
     const onCloseDrawerList = () => props.setDrawerList(props.idPanel, false)
 
     const getVisibleList = () => {
@@ -60,7 +62,7 @@ const ListForm = props => {
             onClose={() => onCloseDrawerList()}
             visible={getVisibleList()}
         >
-            <Form form={form} onLoad={data => resetFields(data)} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => props.form ? editList(data) : addNewList(data)} initialValues={props.form ? props.form : {}}>
+            <Form form={form} onLoad={() => resetFields()} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => props.form ? editList(data) : addNewList(data)} initialValues={props.form}>
                 {getPhoto()}
                 <Form.Item
                     hasFeedback

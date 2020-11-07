@@ -15,7 +15,7 @@ const App = props => {
 					<Switch>
 						<Route path="/login" component={GlobalLayout} pageToDisplay='login' exact />
 						<Route path="/register" component={GlobalLayout} pageToDisplay='register' exact />
-						<Route path="/" exact><Redirect to="/login" /></Route>
+						<Route path="/"><Redirect to="/login" /></Route>
 					</Switch>
 				}
 				{props.auth &&

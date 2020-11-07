@@ -21,6 +21,8 @@ const panel = (state = initialPanel, action) => {
                 add.push(action.payload)
             }
             return add
+        case 'RESET':
+            return initialPanel
         default:
             return state
     }
@@ -55,6 +57,8 @@ const list = (state = initialList, action) => {
                 final.push(current[0])
             }
             return final
+        case 'RESET':
+            return initialList
         default:
             return state
     }
@@ -86,6 +90,8 @@ const task = (state = initialTask, action) => {
                 final.push(current[0])
             }
             return final
+        case 'RESET':
+            return initialTask
         default:
             return state
     }
@@ -131,16 +137,13 @@ const menu = (state = initialStateMenu, action) => {
                 ...state,
                 data: action.payload
             }
+        case 'RESET':
         case 'SET_PANEL':
         case 'SET_LIST_LIST':
         case 'SET_TASK':
         case 'RESET_MENU_FILTER':
         case 'DELETE_ALL_PHOTOS':
-            return {
-                ...state,
-                filter: initialStateMenu.filter,
-                data: initialStateMenu.data,
-            }
+            return initialStateMenu
 
         default:
             return state
@@ -152,6 +155,7 @@ const initialStateActions = {
     drawers: [],
     photos: [],
     photo: null,
+    draggable: false,
 }
 
 const actions = (state = initialStateActions, action) => {
@@ -181,6 +185,12 @@ const actions = (state = initialStateActions, action) => {
                     photo: action.payload,
                     photos: [],
                 }
+            case 'SWAP_DRAGGABLE':
+                return {
+                    ...state,
+                    draggable: !state.draggable
+                }
+            case 'RESET':
             case 'SET_PANEL':
             case 'SET_LIST_LIST':
             case 'SET_TASK':

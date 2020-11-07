@@ -8,11 +8,17 @@ export const setLogin = async (dispatch, token) => {
         .then(sessionService.saveUser({
             token: token
         }))
+    return dispatch({
+        type: 'RESET'
+    })
 }
 
 export const setLogout = async (dispatch) => {
     await sessionService.deleteSession()
         .then(sessionService.deleteUser())
+    return dispatch({
+        type: 'RESET'
+    })
 }
 
 // PANELS
@@ -151,5 +157,11 @@ export const setFormData = (dispatch, data) => {
     return dispatch({
         type: 'SET_FORM_DATA',
         payload: data
+    })
+}
+
+export const swapDraggable = (dispatch) => {
+    return dispatch({
+        type: 'SWAP_DRAGGABLE'
     })
 }

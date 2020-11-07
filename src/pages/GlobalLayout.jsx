@@ -61,7 +61,7 @@ const GlobalLayout = props => {
                             <Title>{panelName}</Title>
                             <h2>{panelDescription}</h2>
                         </Col>
-                        <List id='listContent' idPanel={props.idPanel} />
+                        <List idPanel={props.idPanel} />
                     </React.Fragment>
                 )
 

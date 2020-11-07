@@ -103,13 +103,11 @@ export const apiAddPanel = async (token, data) => {
     }
 }
 
-export const apiUpdatePanel = async (token, data) => {
+export const apiUpdatePanel = async (token, id, data) => {
     try {
-        const url = apiGetapi('panel', data._id)
+        const url = apiGetapi('panel', id)
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
-        const panel = await axios.put(url, {
-            ...data
-        })
+        const panel = await axios.put(url, {...data})
         return panel.data
     } catch (error) {
         console.error(error)
@@ -182,11 +180,27 @@ export const apiAddTask = async (token, id, data) => {
     return task.data
 }
 
+export const apiUpdateTaskPosition = async (token, id, position) => {
+    const url = apiGetapi('task')
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
+    const list = await axios.put(url + '/position/' + id, {
+        position: position
+    })
+    return list.data
+}
+
 export const apiDeleteTask = async (token, id) => {
     const url = apiGetapi('task', id)
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
     const task = await axios.delete(url)
     return task.data
+}
+
+export const apiUpdateTaskStatus = async (token, id) => {
+    const url = apiGetapi('task')
+    axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
+    const list = await axios.put(url + '/status/' + id)
+    return list.data
 }
 
 // PHOTOS

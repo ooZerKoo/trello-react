@@ -10,15 +10,13 @@ import { NavLink } from 'react-router-dom'
 const { Sider } = Layout
 const { SubMenu } = Menu
 
-var done = false
-
 const LeftMenu = props => {
     const doLogout = () => {
         props.setLogout()
     }
 
     const getMenuLists = async () => {
-        if (props.token && !done) {
+        if (props.token && !props.lists[0]) {
             // get panel
             apiGetPanelList(props.token)
                 // set panel to menu
@@ -35,7 +33,6 @@ const LeftMenu = props => {
                                 .then(tasks => props.menuSetTaskList(list._id, tasks))
                         ))
                 ))
-                .then(done = true)
         }
     }
 
@@ -55,7 +52,7 @@ const LeftMenu = props => {
     }
 
     const getMenuLogged = () => {
-        if (done) {
+        if (props.lists[0]) {
             var cont = 0
             return <Menu theme={props.theme} mode="inline" defaultSelectedKeys={['0']}>
                 {renderLineMenu('all', cont++)}
