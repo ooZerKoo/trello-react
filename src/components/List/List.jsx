@@ -14,7 +14,6 @@ import Masonry from 'react-masonry-component'
 const { Meta } = Card
 
 const ListList = props => {
-
     const cover = <img alt="cover" src="https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE4MDI1MX0" />
 
     const getListList = async () => apiGetListList(props.token, props.idPanel).then(list => props.setListList(props.idPanel, list))
@@ -25,7 +24,7 @@ const ListList = props => {
     const openDrawerList = () => props.setDrawerList(props.idPanel, true)
     const openDrawerListEdit = (data) => setListFormData(data).then(() => openDrawerList())
     const swapDraggable = () => {
-        if (props.list[0].list.length > 1) props.swapDraggable()
+        if (props.list[0].lists.length > 1) props.swapDraggable()
     }
     const getListCover = (list) => {
         return <Row justify="center">{list.cover ? <img alt={list.name} src={list.cover.small} /> : cover}</Row>
@@ -39,7 +38,7 @@ const ListList = props => {
         apiUpdateListPosition(props.token, id, position + 1)
     }
     const reorderList = (origin, position) => {
-        const list = Array.from(props.list[0].list)
+        const list = Array.from(props.list[0].lists)
         const [removed] = list.splice(origin, 1)
         list.splice(position, 0, removed)
         props.setListList(props.idPanel, list)
@@ -62,7 +61,7 @@ const ListList = props => {
         ]
     }
 
-    const renderLists = () => props.list[0].list.map((list, index) => renderList(list, index))
+    const renderLists = () => props.list[0].lists.map((list, index) => renderList(list, index))
     const renderList = (list, index) => {
         if (!props.filter || props.filter === list._id) {
             if (props.draggable) {
@@ -93,7 +92,7 @@ const ListList = props => {
         }
     }
 
-    if (props.list[0] && props.list[0].list && props.list[0].list.length > 0) {
+    if (props.list[0].lists) {
         if (props.draggable) {
             return (
                 <React.Fragment>
@@ -131,7 +130,8 @@ const ListList = props => {
 }
 
 const mapStateToProps = (state, extra) => ({
-    list: state.list.filter(v => v.id === extra.idPanel),
+    list: state.user && state.user.data && state.user.data.panels ? state.user.data.panels.filter(v => v._id === extra.idPanel) : [],
+    user: state.user,
     token: state.session.user.token,
     actions: state.actions.actions,
     filter: state.menu.filter.list,

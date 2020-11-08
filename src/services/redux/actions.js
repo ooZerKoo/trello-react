@@ -160,3 +160,23 @@ export const swapDraggable = (dispatch) => {
         type: 'SWAP_DRAGGABLE'
     })
 }
+
+// USER
+export const setLoading = (dispatch) => {
+    return dispatch({
+        type: 'LOADING_USER'
+    })
+}
+
+export const setLoaded = (dispatch) => {
+    return dispatch({
+        type: 'LOADED'
+    })
+}
+
+export const setUser = (dispatch, user) => {
+    return dispatch({
+        type: 'SET_USER',
+        payload: user,
+    })
+}

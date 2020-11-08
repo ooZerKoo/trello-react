@@ -50,7 +50,7 @@ const PanelList = props => {
             return (
                 <Col key={'panelList_'+panel._id} xs={24} sm={12} md={12} lg={8} xl={6} xxl={4}>
                     <Card key={panel._id} cover={panel.cover ? <img alt={panel.name} src={panel.cover.small} /> : cover} actions={actions}>
-                        <Meta title={panel.name} description={panel.description} />
+                        <Meta title={panel.name} description={panel.patata} />
                     </Card>
                 </Col >
             )
@@ -70,7 +70,7 @@ const PanelList = props => {
 }
 
 const mapStateToProps = (state) => ({
-    panels: state.panel,
+    panels: state.user && state.user.data && state.user.data.panels ? state.user.data.panels : [],
     token: state.session.user.token,
     actions: state.actions.actions,
     filter: state.menu.filter.panel,

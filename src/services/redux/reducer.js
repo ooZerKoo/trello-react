@@ -5,6 +5,38 @@ const initialPanel = [false]
 const initialList = [false]
 const initialTask = [false]
 
+const initialUser = {
+    loading: false,
+    loaded: false,
+    data: null
+}
+
+const user = (state = initialUser, action) => {
+    switch (action.type) {
+        case 'LOADING_USER':
+            return {
+                ...state,
+                loaded: false,
+                loading: true,
+            }
+        case 'LOADED':
+            return {
+                ...state,
+                loaded: true,
+                loading: false,
+            }
+        case 'LOGOUT':
+            return initialUser
+        case 'SET_USER':
+            return {
+                ...state,
+                data: action.payload
+            }
+        default:
+            return state
+    }
+}
+
 const panel = (state = initialPanel, action) => {
     var add, final
     switch (action.type) {
@@ -203,11 +235,12 @@ const actions = (state = initialStateActions, action) => {
 }
 
 const reducer = combineReducers({
-    panel: panel,
-    list: list,
-    task: task,
-    menu: menu,
-    actions: actions,
+    user,
+    panel,
+    list,
+    task,
+    menu,
+    actions,
     session: sessionReducer,
 });
 

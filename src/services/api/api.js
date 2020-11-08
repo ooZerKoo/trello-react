@@ -34,6 +34,16 @@ export const apiGetToken = async (username, password) => {
     }
 }
 
+export const apiGetUser = async (token) => {
+    try {
+        const url = apiGetapi('user')
+        const user = await axios.get(url + 'token/' + token)
+        return user.data
+    } catch (error) {
+        console.error(error)
+    }
+}
+
 export const apiSetRegister = async (username, email, password) => {
     try {
         const url = apiGetapi('user')
@@ -107,7 +117,9 @@ export const apiUpdatePanel = async (token, id, data) => {
     try {
         const url = apiGetapi('panel', id)
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + token
-        const panel = await axios.put(url, {...data})
+        const panel = await axios.put(url, {
+            ...data
+        })
         return panel.data
     } catch (error) {
         console.error(error)

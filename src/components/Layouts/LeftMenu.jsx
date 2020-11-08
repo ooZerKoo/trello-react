@@ -1,8 +1,8 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-import { setLogout, filterPanel, setDrawer, setPanelList, addListList, setTaskList } from '../../services/redux/actions'
-import { apiGetListList, apiGetPanelList, apiGetTaskList } from '../../services/api/api.js'
+import { setLogout, filterPanel, setDrawer, setLoaded, setLoading, setUser } from '../../services/redux/actions'
+import { apiGetUser } from '../../services/api/api.js'
 
 import { Layout, Menu } from 'antd'
 import { LoginOutlined, PlusSquareOutlined, EyeOutlined, PlusOutlined, SearchOutlined, LogoutOutlined, FolderOutlined, UnorderedListOutlined } from '@ant-design/icons'
@@ -10,33 +10,20 @@ import { NavLink } from 'react-router-dom'
 const { Sider } = Layout
 const { SubMenu } = Menu
 
-let done = false
 const LeftMenu = props => {
     const doLogout = () => {
         props.setLogout()
     }
 
-    const getMenuLists = async () => {
-        if (props.token && !props.lists[0] && !done) {
-            // get panel
-            apiGetPanelList(props.token)
-                // set panel to menu
-                .then(panels => props.menuSetPanelList(panels))
-
-                .then(panels => panels.payload.map(panel =>
-                    // get list
-                    apiGetListList(props.token, panel._id)
-                        // set list to menu
-                        .then(lists => props.menuSetListList(panel._id, lists))
-                        .then(lists => lists.payload.list.map(list =>
-                            // get task
-                            apiGetTaskList(props.token, list._id)
-                                // set task to menu
-                                .then(tasks => props.menuSetTaskList(list._id, tasks))
-                        ))
-                ))
-
-            done = true
+    const getMenuLists = () => {
+        if (props.auth && props.token && !props.user.loaded) {
+            if (!props.user.loading) {
+                props.setLoading()
+                apiGetUser(props.token)
+                    .then(user => props.setUser(user))
+            } else {
+                props.setLoaded()
+            }
         }
     }
 
@@ -56,13 +43,13 @@ const LeftMenu = props => {
     }
 
     const getMenuLogged = () => {
-        if (props.lists[0]) {
+        if (props.user.loaded && props.user.data) {
             var cont = 0
             return <Menu theme={props.theme} mode="inline" defaultSelectedKeys={['0']}>
                 {renderLineMenu('all', cont++)}
-                {props.panels.map(panel => (
+                {props.user.data.panels.map(panel => (
                     renderLinePanel(panel)
-                ))}
+                    ))}
                 {renderLineMenu('add', 998)}
                 {renderLineMenu('logout', 999)}
             </Menu>
@@ -98,14 +85,13 @@ const LeftMenu = props => {
     }
 
     const renderLinePanel = (panel) => {
-        const lists = props.lists && props.lists.length > 0 ? props.lists.filter(v => v.id === panel._id) : []
-        const finalData = lists[0] && lists[0].list ? lists[0].list : []
+        
         return (
             <SubMenu key={panel._id + '_0'} title={<span><FolderOutlined /><span>{panel.name}</span></span>}>
                 <Menu.Item key={panel._id} icon={<EyeOutlined />}>
                     <NavLink onClick={() => doFilterPanel('panel', panel._id)} to={'/' + panel._id}>Todos los listados</NavLink>
                 </Menu.Item>
-                {renderLineList(finalData)}
+                {renderLineList(panel.lists)}
                 {renderLineMenu('addlist', panel._id, panel._id)}
             </SubMenu>
         )
@@ -138,21 +124,20 @@ const LeftMenu = props => {
 }
 
 const mapSateToProps = state => ({
-    panels: state.panel,
-    lists: state.list,
     collapsed: state.menu.collapsed,
     auth: state.session.authenticated,
     theme: state.menu.theme,
     visible: state.actions.drawers,
-    token: state.session.user.token
+    token: state.session.user.token,
+    user: state.user,
 })
 const mapDispatchToProps = dispatch => ({
     setLogout: () => setLogout(dispatch),
     filterPanel: (type, id) => filterPanel(dispatch, type, id),
     setDrawerMenu: (id, value) => setDrawer(dispatch, id, value),
-    menuSetPanelList: (panels) => setPanelList(dispatch, panels),
-    menuSetListList: (idPanel, list) => addListList(dispatch, idPanel, list),
-    menuSetTaskList: (idList, tasks) => setTaskList(dispatch, idList, tasks),
+    setLoaded: () => setLoaded(dispatch),
+    setLoading: () => setLoading(dispatch),
+    setUser: (user) => setUser(dispatch, user),
 })
 
 const connected = connect(mapSateToProps, mapDispatchToProps)(LeftMenu)

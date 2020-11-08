@@ -32,7 +32,7 @@ const App = props => {
 }
 
 const mapStateToProps = state => ({
-	auth: state.session.authenticated
+	auth: state.session.authenticated,
 })
 const connected = connect(mapStateToProps)(App)
 

@@ -10,6 +10,7 @@ import Login from './Login.jsx'
 import Register from './Register.jsx'
 import Panel from './Panel.jsx'
 import List from './List.jsx'
+import Loading from './Loading.jsx'
 
 import { MenuUnfoldOutlined, MenuFoldOutlined } from '@ant-design/icons';
 import { Layout, Row, Typography, Col } from 'antd';
@@ -42,22 +43,29 @@ const GlobalLayout = props => {
                     </React.Fragment>
                 )
             case '/':
-                return (
-                    <React.Fragment>
-                        <Col span={24} key='paneles'>
-                            <Title>Paneles</Title>
-                        </Col>
-                        <Panel />
-                    </React.Fragment>
-                )
+                if (props.user.loaded) {
+                    return (
+                        <React.Fragment>
+                            <Col span={24} key='paneles'>
+                                <Title>Paneles</Title>
+                            </Col>
+                            <Panel />
+                        </React.Fragment>
+                    )
+                } else {
+                    return (
+                        <React.Fragment>
+                            <Loading />
+                        </React.Fragment>
+                    )
+                }
             case '/:idPanel':
-                const panelName = props.panel && props.panel.name ? props.panel.name : ''
-                const panelDescription = props.panel && props.panel.description ? props.panel.description : ''
+                const panel = props.user.data.panels.filter(v => v._id === props.idPanel)
                 return (
                     <React.Fragment>
                         <Col span={24} key='panelTitle'>
-                            <Title>{panelName}</Title>
-                            <h2>{panelDescription}</h2>
+                            <Title>{panel[0].name}</Title>
+                            <h2>{panel[0].description}</h2>
                         </Col>
                         <List idPanel={props.idPanel} />
                     </React.Fragment>
@@ -92,7 +100,7 @@ const mapSateToProps = (state, extra) => ({
     collapsed: state.menu.collapsed,
     page: extra.match.path,
     idPanel: extra.match.params.idPanel,
-    panel: state.panel.filter(v => v._id === extra.match.params.idPanel)[0],
+    user: state.user,
 })
 
 const mapDispatchToProps = dispatch => ({
