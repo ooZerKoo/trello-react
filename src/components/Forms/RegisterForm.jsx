@@ -107,7 +107,7 @@ const RegisterForm = props => {
                         <Button type="primary" block size="large" htmlType="submit">Regístrate</Button>
                     </Form.Item>
                     <Divider orientation="left">ó bien</Divider>
-                    <NavLink to='/login'><Button block size="large" type="dashed">Inicia Sesión</Button></NavLink>
+                    <NavLink to='/login'><Button block size="large" type="default">Inicia Sesión</Button></NavLink>
                 </Form>
             </Col>
         </Row>

@@ -81,7 +81,7 @@ const LoginForm = props => {
                         <Button type="primary" block size="large" htmlType="submit">Iniciar Sesión</Button>
                     </Form.Item>
                     <Divider orientation="left">ó bien</Divider>
-                    <NavLink to='/register'><Button block size="large" type="dashed">Regístrate</Button></NavLink>
+                    <NavLink to='/register'><Button block size="large" type="default">Regístrate</Button></NavLink>
                 </Form>
             </Col>
         </Row>

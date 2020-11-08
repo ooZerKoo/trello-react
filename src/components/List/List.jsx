@@ -1,11 +1,11 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { setListList, setVisible, setDrawer, setFormData, swapDraggable } from '../../services/redux/actions.js'
+import { setVisible, setDrawer, setFormData, swapDraggable, setListList } from '../../services/redux/actions.js'
 import { apiDeleteList, apiGetListList, apiUpdateListPosition } from '../../services/api/api.js'
 
 import TaskList from '../../components/List/Task'
 
-import { DeleteOutlined, PlusOutlined, EditOutlined, DragOutlined } from '@ant-design/icons'
+import { DeleteOutlined, PlusOutlined, EditOutlined, DragOutlined, CheckCircleOutlined } from '@ant-design/icons'
 import { Card, Popconfirm, Col, Empty, Button, Row, Divider } from 'antd'
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd'
 
@@ -16,19 +16,25 @@ const { Meta } = Card
 const ListList = props => {
     const cover = <img alt="cover" src="https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=400&fit=max&ixid=eyJhcHBfaWQiOjE4MDI1MX0" />
 
-    const getListList = async () => apiGetListList(props.token, props.idPanel).then(list => props.setListList(props.idPanel, list))
-    const setListFormData = async (data) => props.setFormData(data)
-    const deleteOneList = async (id) => apiDeleteList(props.token, id).then(getListList)
-    const showPopconfirm = (id) => props.setVisible(id, true)
-    const handleCancel = (id) => props.setVisible(id, false)
-    const openDrawerList = () => props.setDrawerList(props.idPanel, true)
-    const openDrawerListEdit = (data) => setListFormData(data).then(() => openDrawerList())
-    const swapDraggable = () => {
-        if (props.list[0].lists.length > 1) props.swapDraggable()
+    const updateList = () => {
+        apiGetListList(props.token, props.idPanel)
+            .then(list => props.setListList(props.idPanel, list))
+            .then(() => props.setDrawer(props.idPanel, false))
     }
+
+    const deleteOneList = async (id) => {
+        apiDeleteList(props.token, id)
+            .then(() => updateList())
+    }
+
+    const swapDraggable = () => {
+        if (props.list.length > 1) props.swapDraggable()
+    }
+
     const getListCover = (list) => {
         return <Row justify="center">{list.cover ? <img alt={list.name} src={list.cover.small} /> : cover}</Row>
     }
+
     const dragEndList = async (result) => {
         const id = result.draggableId
         const position = result.destination.index
@@ -37,12 +43,14 @@ const ListList = props => {
         reorderList(origin, position)
         apiUpdateListPosition(props.token, id, position + 1)
     }
+
     const reorderList = (origin, position) => {
-        const list = Array.from(props.list[0].lists)
+        const list = props.list
         const [removed] = list.splice(origin, 1)
         list.splice(position, 0, removed)
         props.setListList(props.idPanel, list)
     }
+
     const getActions = (list) => {
         const currentArray = props.actions.filter(v => v.id === list._id)
         const current = currentArray[0] ? currentArray[0] : { visible: false }
@@ -50,18 +58,21 @@ const ListList = props => {
             <Popconfirm
                 title='¿Quieres eliminarlo?'
                 onConfirm={() => deleteOneList(list._id)}
-                onCancel={() => handleCancel(list._id)}
+                onCancel={() => props.setVisible(list._id, false)}
                 visible={current.visible}
             >
-                <DeleteOutlined key="delete" onClick={() => showPopconfirm(list._id)} />
+                <DeleteOutlined key="delete" onClick={() => props.setVisible(list._id, true)} />
             </Popconfirm>
             ,
-            <EditOutlined key="edit" onClick={() => openDrawerListEdit(list)} />,
-            <DragOutlined onClick={() => swapDraggable()}/>
+            <EditOutlined key="edit" onClick={() => {
+                props.setFormData(list)
+                props.setDrawer(props.idPanel, true)
+            }} />,
+            <DragOutlined onClick={() => swapDraggable()} />
         ]
     }
 
-    const renderLists = () => props.list[0].lists.map((list, index) => renderList(list, index))
+    const renderLists = () => props.list.map((list, index) => renderList(list, index))
     const renderList = (list, index) => {
         if (!props.filter || props.filter === list._id) {
             if (props.draggable) {
@@ -78,12 +89,12 @@ const ListList = props => {
                 )
             } else {
                 return (
-                    <Col span={24} key={list._id + '_col'} style={{textAlign: 'left'}}>
+                    <Col span={24} key={list._id + '_col'} style={{ textAlign: 'left' }}>
                         <Card key={list._id + '_cart'} actions={getActions(list)} cover={getListCover(list)} >
                             <React.Fragment>
                                 <Meta title={list.name} description={list.description} />
                                 <Divider />
-                                <TaskList idList={list._id} />
+                                <TaskList task={list.tasks} idList={list._id} idPanel={props.idPanel} />
                             </React.Fragment>
                         </Card>
                     </Col >
@@ -92,10 +103,15 @@ const ListList = props => {
         }
     }
 
-    if (props.list[0].lists) {
+    if (props.list.length > 0) {
         if (props.draggable) {
             return (
                 <React.Fragment>
+                    <Col span={24}>
+                        <Button size='large' type='primary' onClick={() => swapDraggable()}>
+                            <CheckCircleOutlined /> Terminar de Mover
+                        </Button>
+                    </Col>
                     <DragDropContext key='dragDropContext' onDragEnd={dragEndList}>
                         <Droppable droppableId="droppable" direction="horizontal">
                             {(provided, snapshot) => (
@@ -123,14 +139,13 @@ const ListList = props => {
     return (
         <Col span={24}>
             <Empty description='No hay ninguna lista creada'>
-                <Button type="primary" onClick={() => openDrawerList()}><PlusOutlined /> Añade una lista</Button>
+                <Button type="primary" onClick={() => props.setDrawer(props.idPanel, true)}><PlusOutlined /> Añade una lista</Button>
             </Empty>
         </Col>
     )
 }
 
 const mapStateToProps = (state, extra) => ({
-    list: state.user && state.user.data && state.user.data.panels ? state.user.data.panels.filter(v => v._id === extra.idPanel) : [],
     user: state.user,
     token: state.session.user.token,
     actions: state.actions.actions,
@@ -138,11 +153,11 @@ const mapStateToProps = (state, extra) => ({
     draggable: state.actions.draggable,
 })
 const mapDispatchToProps = (dispatch) => ({
-    setListList: (id, list) => setListList(dispatch, id, list),
     setVisible: (id, value) => setVisible(dispatch, id, value),
-    setDrawerList: (id, value) => setDrawer(dispatch, id, value),
+    setDrawer: (id, value) => setDrawer(dispatch, id, value),
     setFormData: (data) => setFormData(dispatch, data),
     swapDraggable: () => swapDraggable(dispatch),
+    setListList: (id, list) => setListList(dispatch, id, list),
 })
 const connected = connect(
     mapStateToProps,

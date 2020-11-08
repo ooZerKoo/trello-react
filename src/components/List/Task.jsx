@@ -15,7 +15,7 @@ const TaskList = props => {
 
     const getTaskList = async () => {
         apiGetTaskList(props.token, props.idList)
-            .then(task => props.setTaskList(props.idList, task))
+            .then(tasks => props.setTaskList(props.idPanel, props.idList, tasks))
     }
 
     const deleteOneTask = (id) => {
@@ -35,18 +35,15 @@ const TaskList = props => {
         }
     }
     const reorderTask = (origin, position) => {
-        const list = Array.from(props.task[0].list)
-        const [removed] = list.splice(origin, 1)
-        list.splice(position, 0, removed)
-        props.setTaskList(props.idList, list)
+        const tasks = Array.from(props.task)
+        const [removed] = tasks.splice(origin, 1)
+        tasks.splice(position, 0, removed)
+        props.setTaskList(props.idPanel, props.idList, tasks)
     }
-
-    const showPopconfirm = (id) => props.setVisible(id, true)
-    const handleCancel = (id) => props.setVisible(id, false)
 
     const toggleStatus = (id) => {
         apiUpdateTaskStatus(props.token, id)
-            .then(task => getTaskList(task))
+            .then(() => getTaskList())
     }
 
     const getActions = (task) => {
@@ -58,10 +55,10 @@ const TaskList = props => {
                     <Popconfirm
                         title='¿Quieres eliminarlo?'
                         onConfirm={() => deleteOneTask(task._id)}
-                        onCancel={() => handleCancel(task._id)}
+                        onCancel={() => props.setVisible(task._id)}
                         visible={current.visible}
                     >
-                        <DeleteOutlined key="delete" onClick={() => showPopconfirm(task._id)} />
+                        <DeleteOutlined key="delete" onClick={() => props.setVisible(task._id, true)} />
                     </Popconfirm>
                 </li>
                 <li>
@@ -74,7 +71,7 @@ const TaskList = props => {
         )
     }
 
-    const renderTasks = () => props.task[0].list.map((task, index) => renderTask(task, index))
+    const renderTasks = () => props.task.map((task, index) => renderTask(task, index))
     const renderTask = (task, index) => {
         return (
             <Draggable key={task._id} draggableId={task._id} index={index}>
@@ -93,13 +90,13 @@ const TaskList = props => {
         )
     }
 
-    if (props.task[0] && props.task[0].list && props.task[0].list.length > 0) {
+    if (props.task.length > 0) {
         return (
             <React.Fragment>
                 <div className='ant-list ant-list-split'>
                     <div className='ant-spin-nested-loading'>
                         <div className='ant-spin-container'>
-                            <DragDropContext key='dragDropContext' onDragEnd={dragEndTask}>
+                            <DragDropContext key='dragDropContext' onDragEnd={result => dragEndTask(result)}>
                                 <Droppable droppableId="droppable" direction="vertical">
                                     {(provided, snapshot) => (
                                         <ul className="ant-list-items"  {...provided.droppableProps} ref={provided.innerRef} >
@@ -112,7 +109,7 @@ const TaskList = props => {
                         </div>
                     </div>
                 </div >
-                <TaskForm idList={props.idList} />
+                <TaskForm idList={props.idList} idPanel={props.idPanel} />
             </React.Fragment>
         )
     }
@@ -121,19 +118,18 @@ const TaskList = props => {
     return (
         <Col span={24}>
             <Empty description='No hay ninguna tarea creada'>
-                <TaskForm idList={props.idList} />
+                <TaskForm idList={props.idList} idPanel={props.idPanel} />
             </Empty>
         </Col>
     )
 }
 
-const mapStateToProps = (state, extra) => ({
-    task: state.task.filter(v => v.id === extra.idList),
+const mapStateToProps = (state) => ({
     token: state.session.user.token,
     actions: state.actions.actions,
 })
 const mapDispatchToProps = (dispatch) => ({
-    setTaskList: (id, task) => setTaskList(dispatch, id, task),
+    setTaskList: (idPanel, idList, tasks) => setTaskList(dispatch, idPanel, idList, tasks),
     setVisible: (id, value) => setVisible(dispatch, id, value),
     setDrawerTask: (id, value) => setDrawer(dispatch, id, value),
 })

@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { setListList, setDrawer, setFormData } from '../../services/redux/actions.js'
-import { apiAddList, apiGetListList, apiUpdateList } from '../../services/api/api.js'
+import { setDrawer, setFormData, setListList } from '../../services/redux/actions.js'
+import { apiAddList, apiUpdateList, apiGetListList } from '../../services/api/api.js'
 
 import ImageForm from './ImageForm'
 
@@ -12,28 +12,23 @@ const ListForm = props => {
 
     const [form] = Form.useForm();
 
+    const updateList = () => {
+        apiGetListList(props.token, props.idPanel)
+            .then(list => props.setListList(props.idPanel, list))
+            .then(() => props.setDrawer(props.idPanel, false))
+            .then(() => form.resetFields())
+    }
+
     const addNewList = async (data) => {
         apiAddList(props.token, props.idPanel, { name: data.name, description: data.description, cover: props.photo })
-            .then(() => apiGetListList(props.token, props.idPanel))
-            .then(list => props.setListList(props.idPanel, list))
-            .then(props.setDrawerList(props.idPanel, false))
-            .then(form.resetFields())
+            .then(() => updateList())
     }
 
     const editList = async (data) => {
-        const update = props.photo ? { _id: props.form._id, ...data, cover: props.photo} : { _id: props.form._id, ...data }
-        apiUpdateList(props.token, props.idPanel, update)
-            .then(() => apiGetListList(props.token, props.idPanel))
-            .then(list => props.setListList(props.idPanel, list))
-            .then(() => props.setDrawerList(props.idPanel, false))
-            .then(() => props.emptyFormData())
-            .then(form.resetFields())
+        const update = props.photo ? { ...data, cover: props.photo } : { ...data }
+        apiUpdateList(props.token, props.form._id, update)
+            .then(() => updateList())
     }
-
-    const resetFields = () => {
-        form.resetFields()
-    }
-    const onCloseDrawerList = () => props.setDrawerList(props.idPanel, false)
 
     const getVisibleList = () => {
         const check = props.visible.filter(v => v.id === props.idPanel)
@@ -53,16 +48,15 @@ const ListForm = props => {
         return <Row justify="center"><img style={{ marginBottom: '2eM', width: '100%' }} src={photo} alt="foto" /></Row>
     }
 
-
     return (
         <Drawer
             width={640}
             placement="right"
             closable={true}
-            onClose={() => onCloseDrawerList()}
+            onClose={() => props.setDrawer(props.idPanel, false)}
             visible={getVisibleList()}
         >
-            <Form form={form} onLoad={() => resetFields()} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => props.form ? editList(data) : addNewList(data)} initialValues={props.form}>
+            <Form form={form} onLoad={() => form.resetFields()} labelCol={{ span: 8 }} wrapperCol={{ span: 16 }} onFinish={data => props.form ? editList(data) : addNewList(data)} initialValues={props.form}>
                 {getPhoto()}
                 <Form.Item
                     hasFeedback
@@ -70,7 +64,7 @@ const ListForm = props => {
                     name='name'
                     rules={[
                         { required: true, message: 'El nombre es obligatorio' },
-                        { min: 4, message: 'El nombre tiene que ser de 4 caracteres' },
+                        { min: 1, message: 'No puede estar vacío' },
                         { whitespace: true, message: 'No puede estar vacío' },
                     ]}>
                     <Input size="large" />
@@ -96,12 +90,13 @@ const mapStateToProps = (state, extraVars) => ({
     visible: state.actions.drawers,
     photo: state.actions.photo,
     form: state.menu.data,
+    user: state.user,
 })
 
 const mapDispatchToProps = (dispatch) => ({
-    setListList: (id, list) => setListList(dispatch, id, list),
-    setDrawerList: (id, value) => setDrawer(dispatch, id, value),
+    setDrawer: (id, value) => setDrawer(dispatch, id, value),
     emptyFormData: () => setFormData(dispatch, null),
+    setListList: (id, list) => setListList(dispatch, id, list),
 })
 
 const connected = connect(

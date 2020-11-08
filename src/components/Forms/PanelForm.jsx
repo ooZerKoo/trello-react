@@ -12,23 +12,23 @@ const PanelForm = props => {
 
     const [form] = Form.useForm()
 
-    const addNewPanel = async (data) => {
-        apiAddPanel(props.token, { ...data, cover: props.photo })
-            .then(() => apiGetPanelList(props.token))
+    const setPanelList = async () => {
+        apiGetPanelList(props.token)
             .then(panels => props.setPanelList(panels))
             .then(() => props.setDrawerPanel('addPanel', false))
             .then(() => props.emptyFormData())
             .then(() => form.resetFields())
     }
 
+    const addNewPanel = async (data) => {
+        apiAddPanel(props.token, { ...data, cover: props.photo })
+            .then(() => setPanelList())
+    }
+
     const editPanel = async (data) => {
         const update = props.photo ? {...data, cover: props.photo } : { _id: props.form._id, ...data }
         apiUpdatePanel(props.token,  props.form._id, update)
-            .then(() => apiGetPanelList(props.token))
-            .then(panels => props.setPanelList(panels))
-            .then(() => props.setDrawerPanel('addPanel', false))
-            .then(() => props.emptyFormData())
-            .then(() => form.resetFields())
+            .then(() => setPanelList())
     }
 
     const initiateForm = () => {
@@ -39,10 +39,6 @@ const PanelForm = props => {
             name: props.form && props.form.name ? props.form.name : '',
             description: props.form && props.form.description ? props.form.description : '',
         })
-    }
-    const onCloseDrawerPanel = () => {
-        props.emptyFormData()
-        props.setDrawerPanel('addPanel', false)
     }
 
     const getVisiblePanel = () => {
@@ -69,7 +65,10 @@ const PanelForm = props => {
             width={640}
             placement="right"
             closable={true}
-            onClose={() => onCloseDrawerPanel()}
+            onClose={() => {
+                props.emptyFormData()
+                props.setDrawerPanel('addPanel', false)
+            }}
             visible={getVisiblePanel()}
         >
             <Form

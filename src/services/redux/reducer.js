@@ -1,10 +1,6 @@
 import { combineReducers } from 'redux'
 import { sessionReducer } from "redux-react-session"
 
-const initialPanel = [false]
-const initialList = [false]
-const initialTask = [false]
-
 const initialUser = {
     loading: false,
     loaded: false,
@@ -12,6 +8,7 @@ const initialUser = {
 }
 
 const user = (state = initialUser, action) => {
+    var newStatePanel, newStateList, idPanel, tempStatePanel, tempStateList, idList
     switch (action.type) {
         case 'LOADING_USER':
             return {
@@ -25,105 +22,60 @@ const user = (state = initialUser, action) => {
                 loaded: true,
                 loading: false,
             }
-        case 'LOGOUT':
+        case 'RESET':
             return initialUser
         case 'SET_USER':
             return {
                 ...state,
                 data: action.payload
             }
-        default:
-            return state
-    }
-}
-
-const panel = (state = initialPanel, action) => {
-    var add, final
-    switch (action.type) {
         case 'SET_PANEL':
-            return action.payload
-        case 'DELETE_PANEL':
-            final = state.filter(v => v.id !== action.payload)
-            return final
-        case 'ADD_PANEL':
-            if (state[0] === false) {
-                add = [action.payload]
-            } else {
-                add = state
-                add.push(action.payload)
-            }
-            return add
-        case 'RESET':
-            return initialPanel
-        default:
-            return state
-    }
-}
-
-const list = (state = initialList, action) => {
-    var add, final, current
-    switch (action.type) {
-        case 'SET_LIST_LIST':
-            return action.payload
-
-        case 'ADD_LIST':
-            if (state[0] === false) {
-                add = [action.payload]
-            } else {
-                add = state
-                add.push(action.payload)
-            }
-            return add
-
-        case 'ADD_ELEMENT_LIST':
-            if (state[0] === false) {
-                final = [action.payload]
-            } else {
-                final = state.filter(v => v.id !== action.payload.id)
-                current = state.filter(v => v.id === action.payload.id)
-                if (current.length === 0) {
-                    current = action.payload
-                } else {
-                    current[0].list.push(action.payload.list)
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    panels: action.payload
                 }
-                final.push(current[0])
             }
-            return final
-        case 'RESET':
-            return initialList
-        default:
-            return state
-    }
-}
+        case 'SET_LIST':
+            idPanel = action.payload.id
 
-const task = (state = initialTask, action) => {
-    var final, current
-    switch (action.type) {
+            newStatePanel = state.data.panels.filter(v => v._id !== idPanel)
+
+            tempStatePanel = state.data.panels.filter(v => v._id === idPanel)
+            tempStatePanel[0].lists = action.payload.list
+
+            newStatePanel.push(tempStatePanel[0])
+
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    panels: newStatePanel
+                }
+            }
         case 'SET_TASK':
-            if (state[0] === false) {
-                final = [action.payload]
-            } else {
-                final = state.filter(v => v.id !== action.payload.id)
-                final.push(action.payload)
-            }
-            return final
+            idPanel = action.payload.idPanel
+            idList = action.payload.idList
 
-        case 'ADD_TASK':
-            if (state[0] === false) {
-                final = [action.payload]
-            } else {
-                final = state.filter(v => v.id !== action.payload.id)
-                current = state.filter(v => v.id === action.payload.id)
-                if (current.length === 0) {
-                    current = [action.payload]
-                } else {
-                    current[0].list.push(action.payload.list)
+            newStatePanel = state.data.panels.filter(a => a._id !== idPanel)
+            tempStatePanel = state.data.panels.filter(b => b._id === idPanel)
+            
+            newStateList = tempStatePanel[0].lists.filter(v => v._id !== idList)
+            tempStateList = tempStatePanel[0].lists.filter(v => v._id === idList)
+
+            tempStateList[0].tasks = action.payload.tasks
+
+            newStateList.push(tempStateList[0])
+            newStatePanel.push(tempStatePanel[0])
+
+            return {
+                ...state,
+                data: {
+                    ...state.data,
+                    panels: newStatePanel
                 }
-                final.push(current[0])
             }
-            return final
-        case 'RESET':
-            return initialTask
         default:
             return state
     }
@@ -171,10 +123,9 @@ const menu = (state = initialStateMenu, action) => {
             }
         case 'RESET':
         case 'SET_PANEL':
-        case 'SET_LIST_LIST':
+        case 'SET_LIST':
         case 'SET_TASK':
         case 'RESET_MENU_FILTER':
-        case 'DELETE_ALL_PHOTOS':
             return initialStateMenu
 
         default:
@@ -236,9 +187,6 @@ const actions = (state = initialStateActions, action) => {
 
 const reducer = combineReducers({
     user,
-    panel,
-    list,
-    task,
     menu,
     actions,
     session: sessionReducer,

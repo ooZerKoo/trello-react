@@ -8,18 +8,7 @@ const store = createStore(
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 )
 
-const validateSession = (session) => {
-    return true
-}
 
-const options = {
-    refreshOnCheckAuth: true,
-    redirectPath: '/',
-    driver: 'COOKIES',
-    validateSession
-};
-
-
-sessionService.initSessionService(store, options)
+sessionService.initSessionService(store)
 
 export default store

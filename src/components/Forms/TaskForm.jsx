@@ -11,12 +11,16 @@ const TaskForm = props => {
 
     const [form] = Form.useForm();
 
+    const getTaskList = async () => {
+        apiGetTaskList(props.token, props.idList)
+            .then(tasks => props.setTaskList(props.idPanel, props.idList, tasks))
+            .then(() => props.setDrawerTask(props.idList, false))
+            .then(form.resetFields())
+    }
+
     const addNewTask = async (data) => {
         apiAddTask(props.token, props.idList, { ...data, status: false })
-            .then(() => apiGetTaskList(props.token, props.idList))
-            .then(list => props.setTaskList(props.idList, list))
-            .then(props.setDrawerTask(props.idList, false))
-            .then(form.resetFields())
+            .then(() => getTaskList())
     }
 
     const toggleTaskForm = () => {
@@ -41,7 +45,7 @@ const TaskForm = props => {
         <React.Fragment>
             <Divider />
             <Col span={24} style={{ textAlign: 'center' }}>
-                <Button onClick={() => toggleTaskForm()} type='dashed'>
+                <Button onClick={() => toggleTaskForm()} type='default'>
                     <PlusOutlined key="ellipsis"></PlusOutlined> Añade una Tarea
             </Button>
             </Col>
@@ -76,7 +80,7 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = (dispatch) => ({
-    setTaskList: (id, list) => setTaskList(dispatch, id, list),
+    setTaskList: (idPanel, idList, tasks) => setTaskList(dispatch, idPanel, idList, tasks),
     setDrawerTask: (id, value) => setDrawer(dispatch, id, value)
 })
 

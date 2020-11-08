@@ -8,11 +8,15 @@ const Panel = props => {
     return (
         <React.Fragment>
             <PanelForm />
-            <PanelList />
+            <PanelList panels={props.panels} />
         </React.Fragment>
     )
 }
 
-const connected = connect()(Panel)
+const mapStateToProps = state => ({
+    panels: state.user && state.user.data && state.user.data.panels ? state.user.data.panels : [],
+})
+
+const connected = connect(mapStateToProps)(Panel)
 
 export default connected

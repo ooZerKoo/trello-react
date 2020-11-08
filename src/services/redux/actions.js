@@ -40,11 +40,11 @@ export const deletePanel = (dispatch, panel) => {
 // LIST
 export const setListList = (dispatch, id, list) => {
     return dispatch({
-        type: 'SET_LIST_LIST',
-        payload: [{
+        type: 'SET_LIST',
+        payload: {
             id: id,
             list: list
-        }]
+        }
     })
 }
 export const addListList = (dispatch, id, list) => {
@@ -73,12 +73,13 @@ export const addElementList = (dispatch, id, list) => {
 }
 
 // TASKS
-export const setTaskList = (dispatch, id, list) => {
+export const setTaskList = (dispatch, idPanel, idList, tasks) => {
     return dispatch({
         type: 'SET_TASK',
         payload: {
-            id: id,
-            list: list
+            idPanel: idPanel,
+            idList: idList,
+            tasks: tasks
         }
     })
 }
