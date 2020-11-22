@@ -18,7 +18,7 @@ export const apiGetapi = (path, id = null) => {
 }
 
 export const apiGetBaseUrl = () => {
-    return 'http://localhost:4000/'
+    return 'https://geekshubs-trello-api.herokuapp.com/'
 }
 
 export const apiGetToken = async (username, password) => {
